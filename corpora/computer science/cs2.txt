@@ -1,0 +1,26 @@
+Recent applications of Stackelberg Security Games (SSG), from
+wildlife crime to urban crime, have employed machine learning
+tools to learn and predict adversary behavior using available data
+about defender-adversary interactions. Given these recent developments,
+this paper commits to an approach of directly learning the
+response function of the adversary. Using the PAC model, this paper
+lays a firm theoretical foundation for learning in SSGs (e.g.,
+theoretically answer questions about the numbers of samples required
+to learn adversary behavior) and provides utility guarantees
+when the learned adversary model is used to plan the defender’s
+strategy. The paper also aims to answer practical questions
+such as how much more data is needed to improve an adversary
+model’s accuracy. Additionally, we explain a recently observed
+phenomenon that prediction accuracy of learned adversary
+behavior is not enough to discover the utility maximizing defender
+strategy. We provide four main contributions: (1) a PAC model
+of learning adversary response functions in SSGs; (2) PAC-model
+analysis of the learning of key, existing bounded rationality models
+in SSGs; (3) an entirely new approach to adversary modeling based
+on a non-parametric class of response functions with PAC-model
+analysis and (4) identification of conditions under which computing
+the best defender strategy against the learned adversary behavior
+is indeed the optimal strategy. Finally, we conduct experiments
+with real-world data from a national park in Uganda, showing the
+benefit of our new adversary modeling approach and verification of
+our PAC model predictions.
