@@ -3,6 +3,7 @@ This program generates an abstract for a report given a training corpus
 Usage: python generate_abstract.py <path_to_corpus>
 """
 import argparse
+from nltk.parse.generate import generate
 from corpora.corpora_parsing import processCorpus
 
 def main():
@@ -15,10 +16,12 @@ def main():
     args = parser.parse_args()
 
     # Find the corpus and get the ngrams dictionary and cfg grammer from it
-    ngrams, cfg_object = processCorpus(args.path_to_corpus)
+    ngrams, cfg_grammer = processCorpus(args.path_to_corpus)
+
+    print('Grammer done. Making sentences.')
 
     # Print out sentences generated from the cfg
-    #TODO
+    print(len(list(generate(cfg_grammer, depth=3))))
 
 if __name__ == '__main__':
     main()
