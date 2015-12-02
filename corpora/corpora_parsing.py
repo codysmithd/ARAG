@@ -130,9 +130,10 @@ def processCorpus(path):
         if len(tagged):
             all_grammer += 'S ->';
             for tup in tagged:
-                all_grammer += ' ' + tup[1]
-                vocab_dict[tup[1]] = vocab_dict.get(tup[1],set())
-                vocab_dict[tup[1]].add(tup[0])
+                if tup[1] != '-NONE-':
+                    all_grammer += ' ' + tup[1]
+                    vocab_dict[tup[1]] = vocab_dict.get(tup[1],set())
+                    vocab_dict[tup[1]].add(tup[0])
             all_grammer += '\n';
 
         # Get n-grams
