@@ -17,7 +17,7 @@ groucho_grammar = nltk.CFG.fromstring("""
     V -> 'shot'
     P -> 'in'
     """);
-    
+      
 print(groucho_grammar)
 
 
