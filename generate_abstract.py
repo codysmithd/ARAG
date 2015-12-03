@@ -45,7 +45,7 @@ def main():
             best_score = s_score
             best_s = s
     print(best_s)
-    print(best_score)
+    #print(best_score)
 
 if __name__ == '__main__':
     main()
