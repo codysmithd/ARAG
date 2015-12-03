@@ -36,6 +36,23 @@ def get_unique_tags(path):
 
     #print(pos_tags['NN'])
 
+def score_sentence_rule(pos_list):
+    '''
+    Given a list of POS tags for sentence, returns a score
+    '''
+    score = 0
+
+    # Subtract if there are the same tag next to each other
+    for i in range(1,len(pos_list)):
+        if pos_list[i] == pos_list[i-1]:
+            score -= 1
+
+    # Add if sentence is all unique items
+    if len(set(pos_list)) == len(pos_list):
+        score += 1
+
+    return 0
+
 def get_ngrams(path,n):
     '''
     Gets a set of ngrams from a path
@@ -50,7 +67,7 @@ def get_ngrams(path,n):
                 data += f.read().replace('\n', ' ')
 
 
-    # Separt lists for sentances
+    # Separt lists for sentences
     sentences = [[]]
     addedWord = []
     idx = 0;
@@ -80,12 +97,16 @@ def get_ngrams(path,n):
     return set(grams);
 
 
-def processCorpus(path):
+def processCorpus(path, verbose=False, min_sent_rule_score=0):
     '''
-    Gets a set of ngrams, pos from a path
+    Processes a corpus. Returns a dictionary of ngrams, and a CFG
+    Params:
+        path: string path to the corpus (e.g. /corpora/nanocomputing)
+        [verbose]: verbose mode on or off
+        [min_sent_rule_score]: the min value a sentence can have to get added
     '''
-    data = ""
 
+    data = ""
     # Get all text from selected path
     full_path = os.getcwd() + path
     for i in os.listdir(full_path):
@@ -93,21 +114,22 @@ def processCorpus(path):
             with open(full_path + '/' + i, 'r') as f:
                 data += f.read().replace('\n', ' ')
 
-    # Separt lists for sentances
-    sentences = [[]]
-    idx = 0;
-
-    print('Got data from corpus, starting processing.')
+    if verbose: print('Corpus extracted. Processing.')
 
     # Strip out chars we don't like
     whitelist = ['.', ' ', '-', '*'] + [c for c in (string.ascii_letters + string.digits)]
-    new_string = ''
+    s = ''
     for c in data:
         if c in whitelist:
-            new_string += c
-    data = new_string
+            s += c
+    data = s
 
-    # Get 2D array of sentances
+    # Make a 2D array of sentences
+    # sentences = []
+    # for s in data.split('. '):
+    #     sentences.append(s.split(' '))
+    sentences = [[]]
+    idx = 0;
     for word in data.split():
         if '.' not in word:
             sentences[idx].append(word)
@@ -119,45 +141,66 @@ def processCorpus(path):
             idx = idx + 1;
 
     vocab_dict = {}
+    sentence_rules = []
     grams = {};
 
-    # POS TAG Sentance, Add to array of grammer rules
-    all_grammer = ''
-    for sent in sentences:
+    # Loop over each sentence and add sentence_rules, grams, and vocab
+    for s in sentences:
 
         # Cut out punctuation and tag tokenized words with tags from Penn Treebank
-        tagged = nltk.pos_tag(sent)
+        tagged = nltk.pos_tag(s)
+
+        # If we have a non-empty sentence
         if len(tagged):
-            all_grammer += 'S ->';
+
+            sentence_rule = []
+
+            # For each tagged word (word, pos)
             for tup in tagged:
                 if tup[1] != '-NONE-':
-                    all_grammer += ' ' + tup[1]
+                    sentence_rule.append(tup[1])
                     vocab_dict[tup[1]] = vocab_dict.get(tup[1],set())
                     vocab_dict[tup[1]].add(tup[0])
-            all_grammer += '\n';
 
-        # Get n-grams
+            sentence_rules.append(sentence_rule)
+
+        # Add n-grams
         for n in [2,3,4]:
-            tup = ngrams(sent, n);
+            tup = ngrams(s, n);
             grams[n] = []
-            for g in tup:
-                #pos = nltk.pos_tag(word_tokenize(g))
-                grams[n].append(g)
+            for gram in tup:
+                grams[n].append(gram)
 
+    # String used to create grammar
+    all_grammar = ''
+
+    # Add sentence rule to grammar
+    for rule in sentence_rules:
+        if score_sentence_rule(rule) >= min_sent_rule_score:
+            rule_text = ''
+            for pos in rule:
+                rule_text += pos + ' '
+        all_grammar += '\nS -> {0}'.format(rule_text)
+
+    # Add vocab by POS
     for tag in vocab_dict:
-        grammer = tag + ' -> ';
-        for word in vocab_dict[tag]:
-            grammer += " '{0}' | ".format(word);
 
-        grammer = grammer[:-3];
-        all_grammer += grammer + '\n'
+        # Make string of vocab words: word1 | word2 | word3
+        vocab_list = ''
+        vocab_set = vocab_dict[tag]
+        if len(vocab_set):
+            last_word = vocab_set.pop()
+            for word in vocab_set:
+                vocab_list += " '{0}' |".format(word)
+            vocab_list += last_word
 
-    all_grammer = all_grammer.replace('$', 'S')
+        all_grammar += '\n{0} -> {1}'.format(tag, vocab_list)
 
-    print('Processing done. Making grammer.')
+    # Get rid of $, in lue of S
+    all_grammar = all_grammar.replace('$', 'S')
 
-    return grams, nltk.CFG.fromstring(all_grammer)
+    if verbose:
+        print('Processing done. Made grammar:')
+        #print(all_grammar)
 
-
-if __name__ == '__main__':
-    grams = processCorpus('/computer_science')
+    return grams, nltk.CFG.fromstring(all_grammar)

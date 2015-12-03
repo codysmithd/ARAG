@@ -22,7 +22,7 @@ def scoreSentence(s):
 def main():
 
     # Config
-    MAX_NUM_SENTENCES = 10000000
+    MAX_NUM_SENTENCES = 1000
 
     # Argument Parsing
     parser = argparse.ArgumentParser(description="""
@@ -32,7 +32,7 @@ def main():
     args = parser.parse_args()
 
     # Find the corpus and get the ngrams dictionary and cfg grammer from it
-    ngrams, cfg_grammer = processCorpus(args.path_to_corpus)
+    ngrams, cfg_grammer = processCorpus(args.path_to_corpus, verbose=True)
 
     print('Grammer done. Making sentences.')
 
