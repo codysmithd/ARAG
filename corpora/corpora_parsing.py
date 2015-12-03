@@ -111,7 +111,7 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
     full_path = os.getcwd() + path
     for i in os.listdir(full_path):
         if i.endswith(".txt"):
-            with open(full_path + '/' + i, 'r') as f:
+            with open(full_path + '/' + i, 'r',encoding="utf8") as f:
                 data += f.read().replace('\n', ' ')
 
     if verbose: print('Corpus extracted. Processing.')

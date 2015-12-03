@@ -7,7 +7,8 @@ Created on Sun Nov 22 18:11:22 2015
 
 import nltk
 
-groucho_grammar = nltk.CFG.fromstring("""
+groucho_grammar = nltk.CFG.fromstring(
+    """
     S -> NP VP
     PP -> P NP
     NP -> Det N | Det N PP | 'I'
@@ -16,7 +17,8 @@ groucho_grammar = nltk.CFG.fromstring("""
     N -> 'elephant' | 'pajamas'
     V -> 'shot'
     P -> 'in'
-    """);
+    """
+    );
       
 print(groucho_grammar)
 
