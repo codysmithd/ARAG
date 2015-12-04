@@ -11,7 +11,10 @@ from nltk import word_tokenize
 from nltk.corpus import cmudict 
 
 def nsyl(word,dic): 
-   return [len(list(y for y in x if  y[-1].isdigit() ) ) for x in dic[word.lower()]] 
+   if word.lower() in dic.keys(): 
+       return [len(list(y for y in x if  y[-1].isdigit() ) ) for x in dic[word.lower()]]
+   else:
+       return []
 
 def scoreSentence(s,d):
     '''
@@ -23,11 +26,15 @@ def scoreSentence(s,d):
     syllables = 0
     for word in s:
         syllables += len(nsyl(word,d))
-
+    
+    # Flesch reading ease    
+    numWords = len(s);
+    ease = 206.835 - 1.015*(numWords) - 84.6*(syllables/numWords)
+    
     # Duplicate words? Subtract from it's score
     score += len(set(s)) - len(s)
 
-    return score,syllables
+    return score,ease
 
 def main():
 
@@ -53,7 +60,7 @@ def main():
     d = cmudict.dict() 
 
     for s in generate(cfg_grammer, depth=3, n=MAX_NUM_SENTENCES):
-        s_score, syllables = scoreSentence(s,d)
+        s_score, ease = scoreSentence(s,d)
         if s_score > best_score and len(s) > 0:
             best_score = s_score
             best_s = s
@@ -62,9 +69,8 @@ def main():
     print(best_s)
     
     print(best_score)
-    print(syllables)
     
-    #print(best_score)
+    print(ease)
 
 
 if __name__ == '__main__':
