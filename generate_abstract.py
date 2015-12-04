@@ -60,8 +60,12 @@ def main():
             
     
     print(best_s)
+    
     print(best_score)
     print(syllables)
     
+    #print(best_score)
+
+
 if __name__ == '__main__':
     main()

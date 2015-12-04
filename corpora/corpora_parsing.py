@@ -34,8 +34,6 @@ def get_unique_tags(path):
     for pos in data:
         print(pos + ": " + str(len(pos_tags[pos])))
 
-    #print(pos_tags['NN'])
-
 def score_sentence_rule(pos_list):
     '''
     Given a list of POS tags for sentence, returns a score
@@ -51,7 +49,10 @@ def score_sentence_rule(pos_list):
     if len(set(pos_list)) == len(pos_list):
         score += 1
 
-    return 0
+    if len(pos_list) > 14:
+        score -= 10
+
+    return score
 
 def get_ngrams(path,n):
     '''
@@ -65,7 +66,6 @@ def get_ngrams(path,n):
         if i.endswith(".txt"):
             with open(full_path + '/' + i, 'r') as f:
                 data += f.read().replace('\n', ' ')
-
 
     # Separt lists for sentences
     sentences = [[]]
@@ -125,9 +125,6 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
     data = s
 
     # Make a 2D array of sentences
-    # sentences = []
-    # for s in data.split('. '):
-    #     sentences.append(s.split(' '))
     sentences = [[]]
     idx = 0;
     for word in data.split():
@@ -180,7 +177,7 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
             rule_text = ''
             for pos in rule:
                 rule_text += pos + ' '
-        all_grammar += '\nS -> {0}'.format(rule_text)
+            all_grammar += '\nS -> {0}'.format(rule_text)
 
     # Add vocab by POS
     for tag in vocab_dict:
