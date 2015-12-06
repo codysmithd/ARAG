@@ -19,10 +19,21 @@ def scoreSentence(s):
 
     return score
 
+def outputSentence(s):
+    '''
+    '''
+    output = ''
+    if len(s) > 0:
+        output += (s[0][0].upper() + s[0][1:])  # make first word capital
+        for word in s[1:]:
+            output += ' ' + word.lower()
+        output += '.'
+    return output
+
 def main():
 
     # Config
-    MAX_NUM_SENTENCES = 1000
+    MAX_NUM_SENTENCES = 100000
 
     # Argument Parsing
     parser = argparse.ArgumentParser(description="""
@@ -44,7 +55,7 @@ def main():
         if s_score > best_score and len(s) > 0:
             best_score = s_score
             best_s = s
-    print(best_s)
+    print(outputSentence(best_s))
     #print(best_score)
 
 if __name__ == '__main__':
