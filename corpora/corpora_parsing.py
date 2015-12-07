@@ -39,12 +39,33 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
     '''
 
     data = ""
+    
     # Get all text from selected path
     full_path = os.getcwd() + path
     for i in os.listdir(full_path):
         if i.endswith(".txt"):
             with open(full_path + '/' + i, 'r',encoding="utf8") as f:
-                data += f.read().replace('\n', ' ')
+                data += f.read()
+
+    # Strip out unwanted characters
+    data.replace('\n', ' ')
+
+    # Chacters we want to remove
+    blacklist = ['(', ')', ',']
+
+    # Pre-processing
+    processed_data = ''
+    for c in data:
+
+        # Get rid of duplicate spaces
+        if c == ' ' and processed_data[-1] != ' ':
+            processed_data += c
+
+        # Get rid of characters in blacklist
+        elif c not in blacklist:
+            processed_data += c
+
+    data = processed_data
 
     if verbose: print('Corpus extracted. Processing.')
 

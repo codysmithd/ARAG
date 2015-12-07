@@ -148,7 +148,7 @@ def outputSentence(s):
         s = s[1:]
 
     if len(s) > 0:
-        
+
         if s[0][0] in string.ascii_letters:
             output += (s[0][0].upper() + s[0][1:])  # make first word capital
         for word in s[1:]:
@@ -209,10 +209,10 @@ def main():
             best_grade = fgrade
 
     print(outputSentence(best_s))
-    print(best_score)
-    print(best_ease)
-    print(best_grade)
-    print(n_sent)
+    #print(best_score)
+    #print(best_ease)
+    #print(best_grade)
+    #print(n_sent)
 
 
 if __name__ == '__main__':
