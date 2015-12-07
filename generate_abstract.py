@@ -19,6 +19,25 @@ def nsyl(word,dic):
    else:
        return []
 
+def applyBigrams(sentence, bigrams):
+    if len(sentence) < 2:
+        return []
+
+    tagged = nltk.pos_tag(sentence)
+    tagged_ngrams = ngrams(tagged, 2);
+
+    gram_index = 0
+    for tg in tagged_ngrams:
+        k = tg[0][1] + " " + tg[1][1] + " " + tg[2][1];
+        if k in bigrams.keys():
+            random.shuffle(bigrams[k])
+            sentence[gram_index] = bigrams[k][0][0]
+            sentence[gram_index+1] = bigrams[k][0][1]
+
+
+        gram_index = gram_index + 1
+    return sentence
+
 
 def applyTrigrams(sentence, trigrams):
     if len(sentence) < 3:
@@ -41,16 +60,19 @@ def applyTrigrams(sentence, trigrams):
     return sentence
 
 
-def applyBigrams(sentence, bigrams):
-    if len(sentence) < 2:
+
+def applyPOSBigrams(taggedSentence, bigrams):
+    if len(taggedSentence) < 2:
         return []
 
-    tagged = nltk.pos_tag(sentence)
-    tagged_ngrams = ngrams(tagged, 2);
+    tagged_ngrams = ngrams(taggedSentence, 2);
+
+    sentence = ['']*len(taggedSentence)
 
     gram_index = 0
     for tg in tagged_ngrams:
         k = tg[0][1] + " " + tg[1][1] + " " + tg[2][1];
+
         if k in bigrams.keys():
             random.shuffle(bigrams[k])
             sentence[gram_index] = bigrams[k][0][0]
@@ -59,6 +81,31 @@ def applyBigrams(sentence, bigrams):
 
         gram_index = gram_index + 1
     return sentence
+
+
+def applyPOSTrigrams(taggedSentence, trigrams):
+    if len(taggedSentence) < 3:
+        return []
+
+
+    tagged_ngrams = ngrams(taggedSentence, 3);
+
+    sentence = ['']*len(taggedSentence)
+    
+    gram_index = 0
+    for tg in tagged_ngrams:
+        k = tg[0]+ " " + tg[1] + " " + tg[2];
+        
+        if k in trigrams.keys():
+            random.shuffle(trigrams[k])
+
+            sentence[gram_index] = trigrams[k][0][0]
+            sentence[gram_index+1] = trigrams[k][0][1]
+            sentence[gram_index+2] = trigrams[k][0][2]
+
+        gram_index = gram_index + 1
+    return sentence
+
 
 
 
@@ -102,7 +149,7 @@ def outputSentence(s):
 def main():
 
     # Config
-    MAX_NUM_SENTENCES = 1
+    MAX_NUM_SENTENCES = 1000
 
     # Argument Parsing
     parser = argparse.ArgumentParser(description="""
@@ -112,7 +159,8 @@ def main():
     args = parser.parse_args()
 
     # Find the corpus and get the ngrams dictionary and cfg grammer from it
-    bigrams, trigrams, cfg_grammer = processCorpus(args.path_to_corpus, verbose=True)
+#    bigrams, trigrams, cfg_grammer = processCorpus(args.path_to_corpus, verbose=True)
+    bigrams, trigrams, rules = processCorpus(args.path_to_corpus, verbose=True)
 
     print('Grammer done. Making sentences.')
 
@@ -126,8 +174,10 @@ def main():
     d = cmudict.dict() 
 
     
-    for s in generate(cfg_grammer, depth=3, n=MAX_NUM_SENTENCES):
-        s_score, fease, fgrade = scoreSentence(applyTrigrams(s,trigrams),d)
+#    for s in generate(cfg_grammer, depth=3, n=MAX_NUM_SENTENCES):
+    for rule in rules:
+        s = applyPOSTrigrams(rule,trigrams);
+        s_score, fease, fgrade = scoreSentence(s,d)
                 
         ss = s_score + fease - fgrade        
         
