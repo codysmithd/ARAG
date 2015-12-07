@@ -198,7 +198,7 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
             last_word = vocab_set.pop()
             for word in vocab_set:
                 vocab_list += " '{0}' |".format(word)
-            vocab_list += last_word
+            vocab_list += " '{0}' ".format(last_word)
 
         all_grammar += '\n{0} -> {1}'.format(tag, vocab_list)
 
