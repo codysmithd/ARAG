@@ -9,6 +9,7 @@ from corpora.corpora_parsing import processCorpus
 from nltk import word_tokenize
 from nltk.util import ngrams
 import random
+import string
 
 #from curses.ascii import isdigit
 from nltk.corpus import cmudict
@@ -73,10 +74,11 @@ def applyPOSBigrams(taggedSentence, bigrams):
     for tg in tagged_ngrams:
         k = tg[0] + " " + tg[1];
         if k in bigrams.keys():
-            random.shuffle(bigrams[k])
-            sentence[gram_index] = bigrams[k][0][0]
-            sentence[gram_index+1] = bigrams[k][0][1]
-
+            if len(bigrams[k]) > 1:
+                random.shuffle(bigrams[k])
+                sentence[gram_index] = bigrams[k][0][0]
+                sentence[gram_index+1] = bigrams[k][0][1]
+    
 
         gram_index = gram_index + 1
     return sentence
@@ -97,11 +99,12 @@ def applyPOSTrigrams(taggedSentence, trigrams):
         k = tg[0]+ " " + tg[1] + " " + tg[2];
 
         if k in trigrams.keys():
-            random.shuffle(trigrams[k])
-
-            sentence[gram_index] = trigrams[k][0][0]
-            sentence[gram_index+1] = trigrams[k][0][1]
-            sentence[gram_index+2] = trigrams[k][0][2]
+            if len(trigrams[k]) > 1:
+                random.shuffle(trigrams[k])
+    
+                sentence[gram_index] = trigrams[k][0][0]
+                sentence[gram_index+1] = trigrams[k][0][1]
+                sentence[gram_index+2] = trigrams[k][0][2]
 
         gram_index = gram_index + 1
     return sentence
@@ -119,8 +122,8 @@ def scoreSentence(s,d):
     # Duplicate words? Subtract from it's score
     score += len(set(s)) - len(s)
 
-    length = len(s);
-
+    length = len(s)
+    
     syllables = 0
     for word in s:
         syllables += len(nsyl(word,d))
@@ -135,14 +138,18 @@ def scoreSentence(s,d):
     # Flesch–Kincaid grade level
     f_grade = 0.39*(numWords) + 11.8*(syllables/numWords) - 15.59
 
-    return syllables,f_ease,f_grade
+    return f_ease,f_grade,length
 
 def outputSentence(s):
     '''
     '''
     output = ''
+    if s[0] == '':
+        s = s[1:]
+    
     if len(s) > 0:
-        output += (s[0][0].upper() + s[0][1:])  # make first word capital
+        if s[0][0] in string.ascii_letters:
+            output += (s[0][0].upper() + s[0][1:])  # make first word capital
         for word in s[1:]:
             output += ' ' + word.lower()
         output += '.'
@@ -150,8 +157,6 @@ def outputSentence(s):
 
 def main():
 
-    # Config
-    MAX_NUM_SENTENCES = 1000
 
     # Argument Parsing
     parser = argparse.ArgumentParser(description="""
@@ -176,18 +181,23 @@ def main():
     best_grade = 0
     n_sent = 0
 
-    d = cmudict.dict()
+    rule_size_array = []
+    for rule in rules:    
+        rule_size_array.append(len(rule))
+    
+    rule_size_array = sorted(rule_size_array)
+    mean_sent_size = sum(rule_size_array)/len(rule_size_array)
 
 
 #    for s in generate(cfg_grammer, depth=3, n=MAX_NUM_SENTENCES):
     for rule in rules:
-        s = applyPOSTrigrams(rule,trigrams);
         s = applyPOSBigrams(rule,bigrams);
-
-        s_score, fease, fgrade = scoreSentence(s,d)
-
-        ss = s_score
-
+        s = applyPOSTrigrams(rule,trigrams);
+       
+        fease, fgrade, length = scoreSentence(s,d)
+        
+        ss = 0-abs(length - mean_sent_size)
+#        ss =  100
         n_sent = n_sent + 1
         if ss > best_score and len(s) > 0:
             best_score = ss
