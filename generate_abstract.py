@@ -14,11 +14,13 @@ import string
 #from curses.ascii import isdigit
 from nltk.corpus import cmudict
 
+
 def nsyl(word,dic):
    if word.lower() in dic.keys():
        return [len(list(y for y in x if  y[-1].isdigit() ) ) for x in dic[word.lower()]]
    else:
        return []
+
 
 def applyBigrams(sentence, bigrams):
     if len(sentence) < 2:
@@ -61,7 +63,6 @@ def applyTrigrams(sentence, trigrams):
     return sentence
 
 
-
 def applyPOSBigrams(taggedSentence, bigrams):
     if len(taggedSentence) < 2:
         return []
@@ -78,11 +79,10 @@ def applyPOSBigrams(taggedSentence, bigrams):
                 random.shuffle(bigrams[k])
                 sentence[gram_index] = bigrams[k][0][0]
                 sentence[gram_index+1] = bigrams[k][0][1]
-    
+
 
         gram_index = gram_index + 1
     return sentence
-
 
 
 def applyPOSTrigrams(taggedSentence, trigrams):
@@ -101,15 +101,13 @@ def applyPOSTrigrams(taggedSentence, trigrams):
         if k in trigrams.keys():
             if len(trigrams[k]) > 1:
                 random.shuffle(trigrams[k])
-    
+
                 sentence[gram_index] = trigrams[k][0][0]
                 sentence[gram_index+1] = trigrams[k][0][1]
                 sentence[gram_index+2] = trigrams[k][0][2]
 
         gram_index = gram_index + 1
     return sentence
-
-
 
 
 def scoreSentence(s,d):
@@ -123,7 +121,7 @@ def scoreSentence(s,d):
     score += len(set(s)) - len(s)
 
     length = len(s)
-    
+
     syllables = 0
     for word in s:
         syllables += len(nsyl(word,d))
@@ -143,10 +141,12 @@ def scoreSentence(s,d):
 def outputSentence(s):
     '''
     '''
+
     output = ''
+
     if s[0] == '':
         s = s[1:]
-    
+
     if len(s) > 0:
         if s[0][0] in string.ascii_letters:
             output += (s[0][0].upper() + s[0][1:])  # make first word capital
@@ -181,10 +181,12 @@ def main():
     best_grade = 0
     n_sent = 0
 
+    d = cmudict.dict()
+
     rule_size_array = []
-    for rule in rules:    
+    for rule in rules:
         rule_size_array.append(len(rule))
-    
+
     rule_size_array = sorted(rule_size_array)
     mean_sent_size = sum(rule_size_array)/len(rule_size_array)
 
@@ -193,9 +195,9 @@ def main():
     for rule in rules:
         s = applyPOSBigrams(rule,bigrams);
         s = applyPOSTrigrams(rule,trigrams);
-       
+
         fease, fgrade, length = scoreSentence(s,d)
-        
+
         ss = 0-abs(length - mean_sent_size)
 #        ss =  100
         n_sent = n_sent + 1
@@ -204,8 +206,6 @@ def main():
             best_s = s
             best_ease = fease
             best_grade = fgrade
-
-
 
     print(outputSentence(best_s))
     print(best_score)

@@ -66,6 +66,8 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
 
     # Dictionary where keys are n -> which is dictionary of keys that are POS + POS + ...
     _ngrams = {}
+    for n in range(1, 5):
+        _ngrams[n] = {}
 
     # Loop over each sentence and add sentence_rules, grams, and vocab
     for s in sentences:
@@ -80,15 +82,17 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
             tagged_trigrams = ngrams(tagged, 3);
 
             # Make ngrams for n in range
-            for n in range(1,4):
-                grams = {}
+            for n in range(1,5):
                 for g in ngrams(tagged, n):
-                    k = str(g[0])
+
+                    # Make key for POS ngram
+                    key = str(g[0][1])
                     for x in range(1, len(g)):
-                        k += ' ' + g[x][1]
-                    if k not in grams.keys(): grams[k] = []
-                    grams[k].append( [g[i][0] for i in range(1,n)] )
-                _ngrams[n] = grams
+                        key += ' ' + g[x][1]
+
+                    # Add tuple of words to dictionary at key
+                    if key not in _ngrams[n].keys(): _ngrams[n][key] = []
+                    _ngrams[n][key].append( tuple([g[i][0] for i in range(0,n)]) )
 
             # For each tagged word (word, pos)
             for tup in tagged:
