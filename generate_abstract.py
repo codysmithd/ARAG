@@ -7,6 +7,9 @@ import nltk
 from nltk.parse.generate import generate
 from corpora.corpora_parsing import processCorpus
 from nltk import word_tokenize
+from nltk.util import ngrams
+import random
+
 #from curses.ascii import isdigit
 from nltk.corpus import cmudict
 
@@ -67,7 +70,7 @@ def scoreSentence(s,d):
     score = 0
 
     # Duplicate words? Subtract from it's score
-    # score += len(set(s)) - len(s)
+    score += len(set(s)) - len(s)
 
     syllables = 0
     for word in s:
@@ -83,7 +86,7 @@ def scoreSentence(s,d):
     # Flesch–Kincaid grade level
     f_grade = 0.39*(numWords) + 11.8*(syllables/numWords) - 15.59
 
-    return score,f_ease,f_grade
+    return syllables,f_ease,f_grade
 
 def outputSentence(s):
     '''
@@ -99,7 +102,7 @@ def outputSentence(s):
 def main():
 
     # Config
-    MAX_NUM_SENTENCES = 100
+    MAX_NUM_SENTENCES = 1
 
     # Argument Parsing
     parser = argparse.ArgumentParser(description="""
@@ -118,17 +121,22 @@ def main():
     best_s = ''
     best_ease = 0
     best_grade = 0
-
-    d = cmudict.dict()
-
+    n_sent = 0
+    
+    
     for s in generate(cfg_grammer, depth=3, n=MAX_NUM_SENTENCES):
-        s_score, fease, fgrade = scoreSentence(s,d)
-        if s_score > best_score and len(s) > 0:
-            best_score = s_score
+        s_score, fease, fgrade = scoreSentence(applyTrigrams(s,trigrams),d)
+                
+        ss = s_score + fease - fgrade        
+        
+        n_sent = n_sent + 1
+        if ss > best_score and len(s) > 0:
+            best_score = ss
             best_s = s
             best_ease = fease
             best_grade = fgrade
-
+        
+        
 
     print(outputSentence(best_s))
 
@@ -137,6 +145,8 @@ def main():
     print(best_ease)
 
     print(best_grade)
+    
+    print(n_sent)
 
 
 if __name__ == '__main__':
