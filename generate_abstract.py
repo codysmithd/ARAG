@@ -148,6 +148,7 @@ def outputSentence(s):
         s = s[1:]
     
     if len(s) > 0:
+        
         if s[0][0] in string.ascii_letters:
             output += (s[0][0].upper() + s[0][1:])  # make first word capital
         for word in s[1:]:
