@@ -48,14 +48,6 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
 
     if verbose: print('Corpus extracted. Processing.')
 
-    # Strip out chars we don't like
-    whitelist = ['.', ' ', '-', '*'] + [c for c in (string.ascii_letters + string.digits)]
-    s = ''
-    for c in data:
-        if c in whitelist:
-            s += c
-    data = s
-
     # Make a 2D array of sentences
     sentences = [[]]
     idx = 0;
@@ -71,8 +63,10 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
 
     vocab_dict = {}
     sentence_rules = []
-    bigrams = {};
-    trigrams = {};
+
+    # Dictionary where keys are n -> which is dictionary of keys that are POS + POS + ...
+    _ngrams = {}
+
     # Loop over each sentence and add sentence_rules, grams, and vocab
     for s in sentences:
 
@@ -83,21 +77,18 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
         if len(tagged):
 
             sentence_rule = []
-            tagged_bigrams = ngrams(tagged, 2);
             tagged_trigrams = ngrams(tagged, 3);
 
-
-            for tg in tagged_bigrams:
-                k = tg[0][1] + " " + tg[1][1]
-                if k not in bigrams.keys():
-                    bigrams[k] = []
-                bigrams[k].append((tg[0][0],tg[1][0]))
-
-            for tg in tagged_trigrams:
-                k = tg[0][1] + " " + tg[1][1] + " " + tg[2][1];
-                if k not in trigrams.keys():
-                    trigrams[k] = []
-                trigrams[k].append((tg[0][0],tg[1][0],tg[2][0]))
+            # Make ngrams for n in range
+            for n in range(1,4):
+                grams = {}
+                for g in ngrams(tagged, n):
+                    k = str(g[0])
+                    for x in range(1, len(g)):
+                        k += ' ' + g[x][1]
+                    if k not in grams.keys(): grams[k] = []
+                    grams[k].append( [g[i][0] for i in range(1,n)] )
+                _ngrams[n] = grams
 
             # For each tagged word (word, pos)
             for tup in tagged:
@@ -108,9 +99,7 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
 
             sentence_rules.append(sentence_rule)
 
-
     if verbose:
         print('Processing done. Made grammar:')
-        #print(all_grammar)
 
-    return bigrams, trigrams, sentence_rules   
+    return _ngrams, sentence_rules

@@ -91,11 +91,11 @@ def applyPOSTrigrams(taggedSentence, trigrams):
     tagged_ngrams = ngrams(taggedSentence, 3);
 
     sentence = ['']*len(taggedSentence)
-    
+
     gram_index = 0
     for tg in tagged_ngrams:
         k = tg[0]+ " " + tg[1] + " " + tg[2];
-        
+
         if k in trigrams.keys():
             random.shuffle(trigrams[k])
 
@@ -120,7 +120,7 @@ def scoreSentence(s,d):
     score += len(set(s)) - len(s)
 
     length = len(s);
-    
+
     syllables = 0
     for word in s:
         syllables += len(nsyl(word,d))
@@ -162,7 +162,10 @@ def main():
 
     # Find the corpus and get the ngrams dictionary and cfg grammer from it
 #    bigrams, trigrams, cfg_grammer = processCorpus(args.path_to_corpus, verbose=True)
-    bigrams, trigrams, rules = processCorpus(args.path_to_corpus, verbose=True)
+    #bigrams, trigrams, rules = processCorpus(args.path_to_corpus, verbose=True)
+    ngrams, rules = processCorpus(args.path_to_corpus, verbose=True)
+    bigrams = ngrams[2]
+    trigrams = ngrams[3]
 
     print('Grammer done. Making sentences.')
 
@@ -172,27 +175,27 @@ def main():
     best_ease = 0
     best_grade = 0
     n_sent = 0
-    
-    d = cmudict.dict() 
 
-    
+    d = cmudict.dict()
+
+
 #    for s in generate(cfg_grammer, depth=3, n=MAX_NUM_SENTENCES):
     for rule in rules:
         s = applyPOSTrigrams(rule,trigrams);
         s = applyPOSBigrams(rule,bigrams);
-        
+
         s_score, fease, fgrade = scoreSentence(s,d)
-                
-        ss = s_score        
-        
+
+        ss = s_score
+
         n_sent = n_sent + 1
         if ss > best_score and len(s) > 0:
             best_score = ss
             best_s = s
             best_ease = fease
             best_grade = fgrade
-        
-        
+
+
 
     print(outputSentence(best_s))
     print(best_score)
