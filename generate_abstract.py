@@ -33,9 +33,11 @@ def applyBigrams(sentence, bigrams):
     for tg in tagged_ngrams:
         k = tg[0][1] + " " + tg[1][1] + " " + tg[2][1];
         if k in bigrams.keys():
-            random.shuffle(bigrams[k])
-            sentence[gram_index] = bigrams[k][0][0]
-            sentence[gram_index+1] = bigrams[k][0][1]
+            if len(bigrams[k]) > 1:
+                random.shuffle(bigrams[k])
+                
+                sentence[gram_index] = bigrams[k][0][0]
+                sentence[gram_index+1] = bigrams[k][0][1]
 
 
         gram_index = gram_index + 1
@@ -45,7 +47,8 @@ def applyBigrams(sentence, bigrams):
 def applyTrigrams(sentence, trigrams):
     if len(sentence) < 3:
         return []
-
+    
+    print(sentence)
     tagged = nltk.pos_tag(sentence)
     tagged_ngrams = ngrams(tagged, 3);
 
@@ -53,12 +56,35 @@ def applyTrigrams(sentence, trigrams):
     for tg in tagged_ngrams:
         k = tg[0][1] + " " + tg[1][1] + " " + tg[2][1];
         if k in trigrams.keys():
-            random.shuffle(trigrams[k])
+            if len(trigrams[k]) > 1:
+                random.shuffle(trigrams[k])
+    
+                sentence[gram_index] = trigrams[k][0][0]
+                sentence[gram_index+1] = trigrams[k][0][1]
+                sentence[gram_index+2] = trigrams[k][0][2]
 
-            sentence[gram_index] = trigrams[k][0][0]
-            sentence[gram_index+1] = trigrams[k][0][1]
-            sentence[gram_index+2] = trigrams[k][0][2]
+        gram_index = gram_index + 1
+    return sentence
 
+
+def applyQuadgrams(sentence, quadgrams):
+    if len(sentence) < 3:
+        return []
+
+    tagged = nltk.pos_tag(sentence)
+    tagged_ngrams = ngrams(tagged, 4);
+
+    gram_index = 0
+    for tg in tagged_ngrams:
+        k = tg[0][1] + " " + tg[1][1] + " " + tg[2][1] + " " + tg[3][1];
+        if k in quadgrams.keys():
+            if len(quadgrams[k]) > 1:
+                random.shuffle(quadgrams[k])
+    
+                sentence[gram_index] = quadgrams[k][0][0]
+                sentence[gram_index+1] = quadgrams[k][0][1]
+                sentence[gram_index+2] = quadgrams[k][0][2]
+                sentence[gram_index+2] = quadgrams[k][0][3]
         gram_index = gram_index + 1
     return sentence
 
@@ -75,10 +101,18 @@ def applyPOSBigrams(taggedSentence, bigrams):
     for tg in tagged_ngrams:
         k = tg[0] + " " + tg[1];
         if k in bigrams.keys():
-            if len(bigrams[k]) > 1:
+            if len(bigrams[k]) > 0:
                 random.shuffle(bigrams[k])
-                sentence[gram_index] = bigrams[k][0][0]
-                sentence[gram_index+1] = bigrams[k][0][1]
+                
+                skip = False
+                for word in bigrams[k][0]:
+                    if word == '':
+                        skip = True
+
+                    
+                if not skip:
+                    sentence[gram_index] = bigrams[k][0][0]
+                    sentence[gram_index+1] = bigrams[k][0][1]
 
 
         gram_index = gram_index + 1
@@ -101,11 +135,47 @@ def applyPOSTrigrams(taggedSentence, trigrams):
         if k in trigrams.keys():
             if len(trigrams[k]) > 1:
                 random.shuffle(trigrams[k])
+                skip = False
+                for word in trigrams[k][0]:
+                    if word == '':
+                        skip = True
 
-                sentence[gram_index] = trigrams[k][0][0]
-                sentence[gram_index+1] = trigrams[k][0][1]
-                sentence[gram_index+2] = trigrams[k][0][2]
+                if not skip:
+                    sentence[gram_index] = trigrams[k][0][0]
+                    sentence[gram_index+1] = trigrams[k][0][1]
+                    sentence[gram_index+2] = trigrams[k][0][2]
 
+        gram_index = gram_index + 1
+    return sentence
+
+def applyPOSQuadgrams(taggedSentence, quadgrams):
+    if len(taggedSentence) < 4:
+        return []
+
+
+    tagged_ngrams = ngrams(taggedSentence, 4);
+
+    sentence = ['']*len(taggedSentence)
+
+    gram_index = 0
+    for tg in tagged_ngrams:
+        k = tg[0]+ " " + tg[1] + " " + tg[2]  + " " + tg[3]
+
+        if k in quadgrams.keys():
+            if len(quadgrams[k]) > 1:
+                random.shuffle(quadgrams[k])
+                
+                skip = False
+                for word in quadgrams[k][0]:
+                    if word == '':
+                        skip = True
+
+                if not skip:                 
+                    sentence[gram_index] = quadgrams[k][0][0]
+                    sentence[gram_index+1] = quadgrams[k][0][1]
+                    sentence[gram_index+2] = quadgrams[k][0][2]
+                    sentence[gram_index+3] = quadgrams[k][0][3]
+                    
         gram_index = gram_index + 1
     return sentence
 
@@ -144,17 +214,22 @@ def outputSentence(s):
 
     output = ''
 
-    if s[0] == '':
-        s = s[1:]
-
+    
     if len(s) > 0:
-        
+#        for wrd in s:
+#            if wrd == '':
+#                s = s[1:]
+            
+    
         if s[0][0] in string.ascii_letters:
             output += (s[0][0].upper() + s[0][1:])  # make first word capital
         for word in s[1:]:
             output += ' ' + word.lower()
         output += '.'
     return output
+
+
+
 
 def main():
 
@@ -172,7 +247,10 @@ def main():
     ngrams, rules = processCorpus(args.path_to_corpus, verbose=True)
     bigrams = ngrams[2]
     trigrams = ngrams[3]
-
+    quadgrams = ngrams[4]
+    
+#    print(quadgrams)
+#    
     print('Grammer done. Making sentences.')
 
     # Print out max sentences generated from the cfg
@@ -181,7 +259,7 @@ def main():
     best_ease = 0
     best_grade = 0
     n_sent = 0
-
+    
     d = cmudict.dict()
 
     rule_size_array = []
@@ -192,21 +270,38 @@ def main():
     mean_sent_size = sum(rule_size_array)/len(rule_size_array)
 
 
-#    for s in generate(cfg_grammer, depth=3, n=MAX_NUM_SENTENCES):
+    best_sentences = []
+
     for rule in rules:
+#        print("IN" )
+#        print(rule)
         s = applyPOSBigrams(rule,bigrams);
-        s = applyPOSTrigrams(rule,trigrams);
-
+#        print(s)
+        s = applyTrigrams(s,trigrams);
+#        print(s)
+        s = applyQuadgrams(s, quadgrams);
+#        print(s)
+#        print("OUT" )
+#        break
         fease, fgrade, length = scoreSentence(s,d)
+        
+        score = 0-abs(length - mean_sent_size)
+        
+        best_sentences.append((s,score))
+        best_sentences.sort(key=lambda tup: tup[1]) 
+        
+        if len(best_sentences) > 10:
+            best_sentences = best_sentences[1:]
+                
+#        if score > best_score and len(s) > 0:
+#            best_score = ss
+#            best_s = s
+#            best_ease = fease
+#            best_grade = fgrade
 
-        ss = 0-abs(length - mean_sent_size)
-#        ss =  100
-        n_sent = n_sent + 1
-        if ss > best_score and len(s) > 0:
-            best_score = ss
-            best_s = s
-            best_ease = fease
-            best_grade = fgrade
+    for s in best_sentences:
+        print(s)
+        print()
 
     print(outputSentence(best_s))
     print(best_score)
