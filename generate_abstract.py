@@ -82,12 +82,19 @@ def scoreSentence(s,d):
     
     # Flesch reading ease    
     numWords = len(s);
-    ease = 206.835 - 1.015*(numWords) - 84.6*(syllables/numWords)
+    f_ease = 206.835 - 1.015*(numWords) - 84.6*(syllables/numWords)
+    #90.0–100.0	easily understood by an average 11-year-old student
+    #60.0–70.0	easily understood by 13- to 15-year-old students
+    #0.0–30.0	best understood by university graduates
+    
+    # Flesch–Kincaid grade level
+    f_grade = 0.39*(numWords) + 11.8*(syllables/numWords) - 15.59
+
     
     # Duplicate words? Subtract from it's score
     score += len(set(s)) - len(s)
 
-    return score,ease
+    return score,f_ease,f_grade
 
 def outputSentence(s):
     '''
