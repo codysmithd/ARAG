@@ -140,7 +140,8 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
     vocab_dict = {}
     sentence_rules = []
     grams = {};
-
+    bigrams = {};
+    trigrams = {};
     # Loop over each sentence and add sentence_rules, grams, and vocab
     for s in sentences:
 
@@ -151,7 +152,24 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
         if len(tagged):
 
             sentence_rule = []
-
+            tagged_ngrams = ngrams(tagged, n);
+            
+            if n not in bigrams.keys():
+                bigrams[n] = {}    
+            for tg in tagged_ngrams:
+                k = tg[0][1] + " " + tg[1][1]
+                if k not in bigrams[n].keys():
+                    bigrams[n][k] = []
+                bigrams[n][k].append((tg[0][0],tg[1][0]))
+                
+            if n not in trigrams.keys():
+                trigrams[n] = {}    
+            for tg in tagged_ngrams:
+                k = tg[0][1] + " " + tg[1][1] + " " + tg[2][1];
+                if k not in trigrams[n].keys():
+                    trigrams[n][k] = []
+                trigrams[n][k].append((tg[0][0],tg[1][0],tg[2][0]))
+      
             # For each tagged word (word, pos)
             for tup in tagged:
                 if tup[1] != '-NONE-':
@@ -161,12 +179,7 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
 
             sentence_rules.append(sentence_rule)
 
-        # Add n-grams
-        for n in [2,3,4]:
-            tup = ngrams(s, n);
-            grams[n] = []
-            for gram in tup:
-                grams[n].append(gram)
+
 
     # String used to create grammar
     all_grammar = ''
@@ -200,4 +213,4 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
         print('Processing done. Made grammar:')
         #print(all_grammar)
 
-    return grams, nltk.CFG.fromstring(all_grammar)
+    return bigrams, trigrams, nltk.CFG.fromstring(all_grammar)

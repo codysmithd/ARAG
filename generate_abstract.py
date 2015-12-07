@@ -16,6 +16,59 @@ def nsyl(word,dic):
    else:
        return []
 
+
+def applyTrigrams(sentance, trigrams):
+    if len(sentance) < 2:
+        return []
+        
+    tagged = nltk.pos_tag(sentance)
+    n = 3
+    tagged_ngrams = ngrams(tagged, n);
+
+    gram_index = 0
+    for tg in tagged_ngrams:
+        k = tg[0][1] + " " + tg[1][1] + " " + tg[2][1];
+        if k in trigrams[n].keys():
+            random.shuffle(trigrams[n][k])
+            print("old sent 3")
+            print(sentance)
+           
+            sentance[gram_index] = trigrams[n][k][0][0]
+            sentance[gram_index+1] = trigrams[n][k][0][1]
+            sentance[gram_index+2] = trigrams[n][k][0][2]
+            print("new sent 3")
+            print(sentance)
+            
+        gram_index = gram_index + 1
+    return sentance
+
+
+def applyBigrams(sentance, bigrams):
+    if len(sentance) < 2:
+        return []
+        
+    tagged = nltk.pos_tag(sentance)
+    n = 3
+    tagged_ngrams = ngrams(tagged, n);
+
+    gram_index = 0
+    for tg in tagged_ngrams:
+        k = tg[0][1] + " " + tg[1][1] + " " + tg[2][1];
+        if k in bigrams[n].keys():
+            random.shuffle(bigrams[n][k])
+            print("old sent 2")
+            print(sentance)
+           
+            sentance[gram_index] = bigrams[n][k][0][0]
+            sentance[gram_index+1] = bigrams[n][k][0][1]
+            print("new sent 2")
+            print(sentance)
+            
+        gram_index = gram_index + 1
+    return sentance
+
+
+
 def scoreSentence(s,d):
     '''
     Scores a given genrated sentence based on certain criteria
