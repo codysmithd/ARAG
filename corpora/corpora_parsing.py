@@ -43,7 +43,7 @@ def score_sentence_rule(pos_list):
     # Subtract if there are the same tag next to each other
     for i in range(1,len(pos_list)):
         if pos_list[i] == pos_list[i-1]:
-            score -= 1
+            score -= 10
 
     # Add if sentence is all unique items
     if len(set(pos_list)) == len(pos_list):
@@ -152,24 +152,22 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
         if len(tagged):
 
             sentence_rule = []
-            tagged_ngrams = ngrams(tagged, n);
-            
-            if n not in bigrams.keys():
-                bigrams[n] = {}    
-            for tg in tagged_ngrams:
+            tagged_bigrams = ngrams(tagged, 2);
+            tagged_trigrams = ngrams(tagged, 3);
+
+
+            for tg in tagged_bigrams:
                 k = tg[0][1] + " " + tg[1][1]
-                if k not in bigrams[n].keys():
-                    bigrams[n][k] = []
-                bigrams[n][k].append((tg[0][0],tg[1][0]))
-                
-            if n not in trigrams.keys():
-                trigrams[n] = {}    
-            for tg in tagged_ngrams:
+                if k not in bigrams.keys():
+                    bigrams[k] = []
+                bigrams[k].append((tg[0][0],tg[1][0]))
+
+            for tg in tagged_trigrams:
                 k = tg[0][1] + " " + tg[1][1] + " " + tg[2][1];
-                if k not in trigrams[n].keys():
-                    trigrams[n][k] = []
-                trigrams[n][k].append((tg[0][0],tg[1][0],tg[2][0]))
-      
+                if k not in trigrams.keys():
+                    trigrams[k] = []
+                trigrams[k].append((tg[0][0],tg[1][0],tg[2][0]))
+
             # For each tagged word (word, pos)
             for tup in tagged:
                 if tup[1] != '-NONE-':
@@ -178,8 +176,6 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
                     vocab_dict[tup[1]].add(tup[0])
 
             sentence_rules.append(sentence_rule)
-
-
 
     # String used to create grammar
     all_grammar = ''
