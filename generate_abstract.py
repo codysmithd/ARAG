@@ -71,8 +71,7 @@ def applyPOSBigrams(taggedSentence, bigrams):
 
     gram_index = 0
     for tg in tagged_ngrams:
-        k = tg[0][1] + " " + tg[1][1] + " " + tg[2][1];
-
+        k = tg[0] + " " + tg[1];
         if k in bigrams.keys():
             random.shuffle(bigrams[k])
             sentence[gram_index] = bigrams[k][0][0]
@@ -81,6 +80,7 @@ def applyPOSBigrams(taggedSentence, bigrams):
 
         gram_index = gram_index + 1
     return sentence
+
 
 
 def applyPOSTrigrams(taggedSentence, trigrams):
@@ -119,6 +119,8 @@ def scoreSentence(s,d):
     # Duplicate words? Subtract from it's score
     score += len(set(s)) - len(s)
 
+    length = len(s);
+    
     syllables = 0
     for word in s:
         syllables += len(nsyl(word,d))
@@ -177,9 +179,11 @@ def main():
 #    for s in generate(cfg_grammer, depth=3, n=MAX_NUM_SENTENCES):
     for rule in rules:
         s = applyPOSTrigrams(rule,trigrams);
+        s = applyPOSBigrams(rule,bigrams);
+        
         s_score, fease, fgrade = scoreSentence(s,d)
                 
-        ss = s_score + fease - fgrade        
+        ss = s_score        
         
         n_sent = n_sent + 1
         if ss > best_score and len(s) > 0:
@@ -191,13 +195,9 @@ def main():
         
 
     print(outputSentence(best_s))
-
     print(best_score)
-
     print(best_ease)
-
     print(best_grade)
-    
     print(n_sent)
 
 
