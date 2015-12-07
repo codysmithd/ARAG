@@ -123,6 +123,8 @@ def main():
     best_grade = 0
     n_sent = 0
     
+    d = cmudict.dict() 
+
     
     for s in generate(cfg_grammer, depth=3, n=MAX_NUM_SENTENCES):
         s_score, fease, fgrade = scoreSentence(applyTrigrams(s,trigrams),d)
