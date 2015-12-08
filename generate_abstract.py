@@ -186,19 +186,22 @@ def applyPOSQuadgrams(taggedSentence, quadgrams):
 def applyBigramsSubjectMatch(sentence, bigrams, subject):
     if len(sentence) < 2:
         return []
-
+    
     tagged = nltk.pos_tag(sentence, tagset=tag_set)
     tagged_ngrams = ngrams(tagged, 2);
 
     gram_index = 0
     for tg in tagged_ngrams:
-        k = tg[0][1] + " " + tg[1][1]
-        if k in bigrams.keys():
-            for gram in bigrams[k]:
-                if subject in gram:
-                    sentence[gram_index] = bigrams[k][0][0]
+        k = tg[0][1] + " " + tg[1][1];
+        if 'NNP' in k.split():
+            if k in bigrams.keys():
+                random.shuffle(bigrams[k])
+                if tg[0][1] == 'NNP':
+                    sentence[gram_index] = subject[0].split()[0]
                     sentence[gram_index+1] = bigrams[k][0][1]
-
+                elif tg[1][1] == 'NNP':
+                    sentence[gram_index] = bigrams[k][0][0]
+                    sentence[gram_index+1] = subject[0].split()[0]
 
         gram_index = gram_index + 1
     return sentence
@@ -209,22 +212,29 @@ def applyTrigramsSubjectMatch(sentence, trigrams, subject):
     
     tagged = nltk.pos_tag(sentence, tagset=tag_set)
     tagged_ngrams = ngrams(tagged, 3);
-    
+
     gram_index = 0
     for tg in tagged_ngrams:
         k = tg[0][1] + " " + tg[1][1] + " " + tg[2][1];
-        if k in trigrams.keys():
-            for gram in trigrams[k]:
-                if subject in gram:
-                    sentence[gram_index] = gram[0]
-                    sentence[gram_index+1] = gram[1]
-                    sentence[gram_index+2] = gram[2]
+        if 'NNP' in k.split():
+            if k in trigrams.keys():
+                random.shuffle(trigrams[k])
+                if tg[0][1] == 'NNP':
+                    sentence[gram_index] = subject[0].split()[0]
+                    sentence[gram_index+1] = trigrams[k][0][1]
+                    sentence[gram_index+2] = trigrams[k][0][2]
+                elif tg[1][1] == 'NNP':
+                    sentence[gram_index] = trigrams[k][0][0]
+                    sentence[gram_index+1] = subject[0].split()[0]
+                    sentence[gram_index+2] = trigrams[k][0][2]
+                elif tg[2][1] == 'NNP':
+                    sentence[gram_index] = trigrams[k][0][0]
+                    sentence[gram_index+1] = trigrams[k][0][1]
+                    sentence[gram_index+2] = subject[0].split()[0]
 
         gram_index = gram_index + 1
-        
     return sentence
-
-
+    
 def scoreSentence(s,d):
     '''
     Scores a given genrated sentence based on certain criteria
@@ -282,8 +292,11 @@ def scoreRule_A(rule,freq_dist_rules_list,mean_sent_size):
     
     result = 0;
     for tag in rule:
+        if tag == 'NNP':
+            result += 5
         if tag in top_ten:
             result += 1;
+
     
     result = result - abs(len(rule) - mean_sent_size)    
     
@@ -366,8 +379,6 @@ def main():
     freq_dist_rules_list.sort(key=lambda tup: tup[1], reverse=True) 
 
     
-        
-    
     print("Scanning Rules...")
     for rule in rules:
         rule_score = scoreRule_A(rule,freq_dist_rules_list,mean_sent_size)
@@ -380,11 +391,11 @@ def main():
     # RUN PARAMERS        
     iterations = 10
     subject_range = 15
-    
+    n_best_sent = 30
+  
         
     print('Finding subject...')
     subject = common_nouns_list_nnp[-subject_range:][int(random.random()*subject_range)]
-    print(subject)
     
     rule_idx = 0;
     si = 1
@@ -392,14 +403,13 @@ def main():
     while si <= iterations:
         si += 1
         for rule in best_rules:
-            print(rule_idx)
+            print(rule_idx,end=' ')
             rule_idx+=1
             
             s = applyPOSBigrams(rule[0],bigrams);
             s = applyTrigrams(s,trigrams);
-#            s =  applyTrigramsSubjectMatch(s, trigrams, subject)
+            s =  applyTrigramsSubjectMatch(s, trigrams, subject)
             s = applyBigramsSubjectMatch(s, bigrams, subject)
-            
             fease, fgrade, length = scoreSentence(s,d)
             
             score = fease - fgrade 
@@ -407,15 +417,30 @@ def main():
             best_sentences.append((s,score,rule))
             best_sentences.sort(key=lambda tup: tup[1]) 
             
-            if len(best_sentences) > 10:
+            if len(best_sentences) > n_best_sent:
                 best_sentences = best_sentences[1:]
 
-    for s in best_sentences:
-        print(outputSentence(s[0]))
-        print(s[1])
-        print(s[2])
-        print()
+#    for s in best_sentences:
+#        print(outputSentence(s[0]))
+#        print(s[1])
+#        print(s[2])
+#        print()
 
+
+
+    print()
+    # Build sentence
+    setences_in_paragraph = 5
+    indexes = [i for i in range(0, n_best_sent)];
+    random.shuffle(indexes)
+
+    print('Subject: '+ subject[0].split()[0] + '\n')
+    abstract = '    '     
+    for i in range(0 , setences_in_paragraph):
+        abstract += outputSentence(best_sentences[i][0]) + ' ';
+        
+    
+    print(abstract)
 
 
 if __name__ == '__main__':
