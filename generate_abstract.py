@@ -315,8 +315,11 @@ def main():
         Generates a report abstract given a path to a corpus of abstracts
     """)
     parser.add_argument('path_to_corpus', help='Path to corpus of abstacts')
+    parser.add_argument('-subject', help='Subject of the abstract')
     args = parser.parse_args()
+        
 
+        
     # Find the corpus and get the ngrams dictionary and cfg grammer from it
 #    bigrams, trigrams, cfg_grammer = processCorpus(args.path_to_corpus, verbose=True)
     #bigrams, trigrams, rules = processCorpus(args.path_to_corpus, verbose=True)
@@ -398,10 +401,15 @@ def main():
     subject_range = 15
     n_best_sent = 30
   
-        
-    print('Finding subject...')
-    subject = common_nouns_list_nnp[-subject_range:][int(random.random()*subject_range)]
+    if (args.subject == None):
+        print('Finding subject...')
+        subject = common_nouns_list_nnp[-subject_range:][int(random.random()*subject_range)]
+    else:
+        print('Subject provided: '+ args.subject)
+        subject = [args.subject+' A',()]
     
+#        subject[0].split()[0]
+        
     rule_idx = 0;
     si = 1
     print("Sentence Gen...")
@@ -439,10 +447,15 @@ def main():
     indexes = [i for i in range(0, n_best_sent)];
     random.shuffle(indexes)
 
-    print('Subject: '+ subject[0].split()[0] + '\n')
+    if args.subject == None:
+        subject = subject[0].split()[0]
+    else:
+        subject = args.subject
+        
+    print('Subject: '+ subject + '\n')
     abstract = '    '     
     for i in range(0 , setences_in_paragraph):
-        abstract += outputSentence(best_sentences[i][0],subject[0].split()[0]) + ' ';
+        abstract += outputSentence(best_sentences[i][0],subject) + ' ';
         
     
     print(abstract)
