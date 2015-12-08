@@ -42,7 +42,7 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
     '''
 
     data = ""
-    
+
     # Get all text from selected path
     full_path = os.getcwd() + path
     for i in os.listdir(full_path):
@@ -54,7 +54,7 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
     data.replace('\n', ' ')
 
     # Chacters we want to remove
-    blacklist = ['(', ')', ',']
+    blacklist = ['(', ')', ',', '"']
 
     # Pre-processing
     processed_data = ''
