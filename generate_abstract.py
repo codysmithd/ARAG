@@ -37,7 +37,7 @@ def applyBigrams(sentence, bigrams):
         if k in bigrams.keys():
             if len(bigrams[k]) > 1:
                 random.shuffle(bigrams[k])
-                
+
                 sentence[gram_index] = bigrams[k][0][0]
                 sentence[gram_index+1] = bigrams[k][0][1]
 
@@ -59,7 +59,7 @@ def applyTrigrams(sentence, trigrams):
         if k in trigrams.keys():
             if len(trigrams[k]) > 1:
                 random.shuffle(trigrams[k])
-    
+
                 sentence[gram_index] = trigrams[k][0][0]
                 sentence[gram_index+1] = trigrams[k][0][1]
                 sentence[gram_index+2] = trigrams[k][0][2]
@@ -81,7 +81,7 @@ def applyQuadgrams(sentence, quadgrams):
         if k in quadgrams.keys():
             if len(quadgrams[k]) > 1:
                 random.shuffle(quadgrams[k])
-    
+
                 sentence[gram_index] = quadgrams[k][0][0]
                 sentence[gram_index+1] = quadgrams[k][0][1]
                 sentence[gram_index+2] = quadgrams[k][0][2]
@@ -104,13 +104,13 @@ def applyPOSBigrams(taggedSentence, bigrams):
         if k in bigrams.keys():
             if len(bigrams[k]) > 0:
                 random.shuffle(bigrams[k])
-                
+
                 skip = False
                 for word in bigrams[k][0]:
                     if word == '':
                         skip = True
 
-                    
+
                 if not skip:
                     sentence[gram_index] = bigrams[k][0][0]
                     sentence[gram_index+1] = bigrams[k][0][1]
@@ -165,18 +165,18 @@ def applyPOSQuadgrams(taggedSentence, quadgrams):
         if k in quadgrams.keys():
             if len(quadgrams[k]) > 1:
                 random.shuffle(quadgrams[k])
-                
+
                 skip = False
                 for word in quadgrams[k][0]:
                     if word == '':
                         skip = True
 
-                if not skip:                 
+                if not skip:
                     sentence[gram_index] = quadgrams[k][0][0]
                     sentence[gram_index+1] = quadgrams[k][0][1]
                     sentence[gram_index+2] = quadgrams[k][0][2]
                     sentence[gram_index+3] = quadgrams[k][0][3]
-                    
+
         gram_index = gram_index + 1
     return sentence
 
@@ -189,7 +189,7 @@ def scoreSentence(s,d):
     score = 0
 
     # Duplicate words? Subtract from it's score
-    score += len(set(s)) - len(s)
+    score += (len(set(s)) - len(s)) * 10
 
     length = len(s)
 
@@ -215,7 +215,6 @@ def outputSentence(s):
 
     output = ''
 
-    
     if len(s) > 0:
         if s[0][0] in string.ascii_letters:
             output += (s[0][0].upper() + s[0][1:])  # make first word capital
@@ -262,9 +261,9 @@ def main():
     bigrams = ngrams[2]
     trigrams = ngrams[3]
     quadgrams = ngrams[4]
-    
+
 #    print(quadgrams)
-#    
+#
     print('Grammer done. Making sentences.')
 
     # Print out max sentences generated from the cfg
@@ -278,7 +277,6 @@ def main():
 
     rule_size_array = sorted(rule_size_array)
     mean_sent_size = sum(rule_size_array)/len(rule_size_array)
-
 
     best_sentences = []
     best_rules = []
@@ -332,7 +330,9 @@ def main():
                 best_sentences = best_sentences[1:]
 
     for s in best_sentences:
-        print(s)
+        print(outputSentence(s[0]))
+        print(s[1])
+        print(s[2])
         print()
 
 

@@ -70,8 +70,6 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
 
     data = processed_data
 
-    if verbose: print('Corpus extracted. Processing.')
-
     # Make a 2D array of sentences
     sentences = [[]]
     idx = 0;
@@ -93,6 +91,8 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
     for n in range(1, 5):
         _ngrams[n] = {}
 
+    if verbose: print('Corpus extracted. Processing.')
+
     # Loop over each sentence and add sentence_rules, grams, and vocab
     for s in sentences:
 
@@ -101,9 +101,6 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
         
         # If we have a non-empty sentence
         if len(tagged):
-
-            sentence_rule = []
-            tagged_trigrams = ngrams(tagged, 3);
 
             # Make ngrams for n in range
             for n in range(1,5):
@@ -118,16 +115,24 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
                     if key not in _ngrams[n].keys(): _ngrams[n][key] = []
                     _ngrams[n][key].append( tuple([g[i][0] for i in range(0,n)]) )
 
-            # For each tagged word (word, pos)
+            # Make sentence rule
+            sentence_rule = []
+            shouldAddSentenceRule = True
+
             for tup in tagged:
-                if tup[1] != '-NONE-':
-                    sentence_rule.append(tup[1])
-                    vocab_dict[tup[1]] = vocab_dict.get(tup[1],set())
-                    vocab_dict[tup[1]].add(tup[0])
+                word, tag = tup[0], tup[1]
 
-            sentence_rules.append(sentence_rule)
+                # If we have duplicate tags next to each other or something we couldn't tag, lets not add it
+                if tag == '-NONE-' or (len(sentence_rule) and tag == sentence_rule[-1]):
+                    shouldAddSentenceRule = False
+                    break
+                else:
+                    # Add it to the sentence rule and add the word to vocab
+                    sentence_rule.append(tag)
+                    vocab_dict[tag] = vocab_dict.get(tag,set())
+                    vocab_dict[tag].add(word)
 
-    if verbose:
-        print('Processing done. Made grammar:')
+            if shouldAddSentenceRule:
+                sentence_rules.append(sentence_rule)
 
     return _ngrams, sentence_rules
