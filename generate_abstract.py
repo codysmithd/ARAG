@@ -297,7 +297,7 @@ def main():
         
     freq_dist_rules_list.sort(key=lambda tup: tup[1], reverse=True) 
 
-    print("Scanning Rules...")    
+    print("Scanning Rules...")
     for rule in rules:
         rule_score = scoreRule_A(rule,freq_dist_rules_list,mean_sent_size)
         best_rules.append((rule,rule_score))
