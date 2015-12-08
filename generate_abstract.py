@@ -14,6 +14,8 @@ import string
 #from curses.ascii import isdigit
 from nltk.corpus import cmudict
 
+#tag_set = 'universal'
+tag_set = None
 
 def nsyl(word,dic):
    if word.lower() in dic.keys():
@@ -26,7 +28,7 @@ def applyBigrams(sentence, bigrams):
     if len(sentence) < 2:
         return []
 
-    tagged = nltk.pos_tag(sentence)
+    tagged = nltk.pos_tag(sentence, tagset=tag_set)
     tagged_ngrams = ngrams(tagged, 2);
 
     gram_index = 0
@@ -47,9 +49,8 @@ def applyBigrams(sentence, bigrams):
 def applyTrigrams(sentence, trigrams):
     if len(sentence) < 3:
         return []
-
-    #print(sentence)
-    tagged = nltk.pos_tag(sentence)
+    
+    tagged = nltk.pos_tag(sentence, tagset=tag_set)
     tagged_ngrams = ngrams(tagged, 3);
 
     gram_index = 0
@@ -71,7 +72,7 @@ def applyQuadgrams(sentence, quadgrams):
     if len(sentence) < 3:
         return []
 
-    tagged = nltk.pos_tag(sentence)
+    tagged = nltk.pos_tag(sentence, tagset=tag_set)
     tagged_ngrams = ngrams(tagged, 4);
 
     gram_index = 0
@@ -222,6 +223,27 @@ def outputSentence(s):
         output += '.'
     return output
 
+
+
+def scoreRule_A(rule,freq_dist_rules_list,mean_sent_size):
+    total = 0;
+    top_ten = []
+    i = 0
+    for r in freq_dist_rules_list:
+        total += r[1]
+        if i < 10:
+            top_ten.append(r[0])
+            i+=1
+    
+    result = 0;
+    for tag in rule:
+        if tag in top_ten:
+            result += 1;
+    
+    result = result - abs(len(rule) - mean_sent_size)    
+    
+    return result
+    
 def main():
 
 
@@ -245,12 +267,8 @@ def main():
     print('Grammer done. Making sentences.')
 
     # Print out max sentences generated from the cfg
-    best_score = float('-inf')
-    best_s = ''
-    best_ease = 0
-    best_grade = 0
-    n_sent = 0
 
+    
     d = cmudict.dict()
 
     rule_size_array = []
@@ -261,27 +279,63 @@ def main():
     mean_sent_size = sum(rule_size_array)/len(rule_size_array)
 
     best_sentences = []
-
+    best_rules = []
+   
+    freq_dist_rules = {}
     for rule in rules:
-        s = applyPOSBigrams(rule,bigrams)
-        s = applyTrigrams(s,trigrams)
-        s = applyQuadgrams(s, quadgrams)
-        fease, fgrade, length = scoreSentence(s,d)
+        for tag in rule:
+            if tag not in freq_dist_rules:
+                freq_dist_rules[tag] = 0
+                
+            freq_dist_rules[tag] += 1
 
-        score = 0-abs(length - mean_sent_size)
+    freq_dist_rules_list = []
+    for k in freq_dist_rules:
+        freq_dist_rules_list.append((k,freq_dist_rules[k]))
+        
+    freq_dist_rules_list.sort(key=lambda tup: tup[1], reverse=True) 
 
-        best_sentences.append((s,score, rule))
-
-        if len(best_sentences) > 10:
-            best_sentences = best_sentences[1:]
-
-    best_sentences.sort(key=lambda tup: tup[1])
+    print("Scanning Rules...")    
+    for rule in rules:
+        rule_score = scoreRule_A(rule,freq_dist_rules_list,mean_sent_size)
+        best_rules.append((rule,rule_score))
+        best_rules.sort(key=lambda tup: tup[1]) 
+        if len(best_rules) > 10:
+            best_rules = best_rules[1:]
+    
+    iterations = 10
+    
+    rule_idx = 0;
+    si = 1
+    print("Sentence Gen...")
+    while si <= iterations:
+        si += 1
+        for rule in best_rules:
+            print(rule_idx)
+            rule_idx+=1
+    
+            s = applyPOSBigrams(rule[0],bigrams);
+            s = applyTrigrams(s,trigrams);
+    
+    
+            fease, fgrade, length = scoreSentence_A(s,d)
+                    
+            score = fease - fgrade 
+            
+            
+            best_sentences.append((s,score))
+            best_sentences.sort(key=lambda tup: tup[1]) 
+            
+            if len(best_sentences) > 10:
+                best_sentences = best_sentences[1:]
 
     for s in best_sentences:
         print(outputSentence(s[0]))
         print(s[1])
         print(s[2])
         print()
+
+
 
 if __name__ == '__main__':
     main()

@@ -8,6 +8,9 @@ import re
 import os
 import string
 
+
+tag_set = None
+
 def score_sentence_rule(pos_list):
     '''
     Given a list of POS tags for sentence, returns a score
@@ -94,8 +97,8 @@ def processCorpus(path, verbose=False, min_sent_rule_score=0):
     for s in sentences:
 
         # Cut out punctuation and tag tokenized words with tags from Penn Treebank
-        tagged = nltk.pos_tag(s)
-
+        tagged = nltk.pos_tag(s, tagset=tag_set)
+        
         # If we have a non-empty sentence
         if len(tagged):
 
