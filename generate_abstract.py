@@ -401,13 +401,10 @@ def main():
     subject_range = 15
     n_best_sent = 30
   
-    if (args.subject == None):
-        print('Finding subject...')
-        subject = common_nouns_list_nnp[-subject_range:][int(random.random()*subject_range)]
-    else:
-        print('Subject provided: '+ args.subject)
-        subject = [args.subject+' A',()]
-    
+
+    print('Finding subject...')
+    subject = common_nouns_list_nnp[-subject_range:][int(random.random()*subject_range)]
+
 #        subject[0].split()[0]
         
     rule_idx = 0;
@@ -447,10 +444,8 @@ def main():
     indexes = [i for i in range(0, n_best_sent)];
     random.shuffle(indexes)
 
-    if args.subject == None:
-        subject = subject[0].split()[0]
-    else:
-        subject = args.subject
+    subject = subject[0].split()[0]
+
         
     print('Subject: '+ subject + '\n')
     abstract = '    '     
