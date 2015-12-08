@@ -209,6 +209,7 @@ def scoreSentence(s,d):
 
     return f_ease,f_grade,length
 
+
 def outputSentence(s):
     '''
     '''
@@ -318,12 +319,12 @@ def main():
             s = applyTrigrams(s,trigrams);
     
     
-            fease, fgrade, length = scoreSentence_A(s,d)
+            fease, fgrade, length = scoreSentence(s,d)
                     
             score = fease - fgrade 
             
             
-            best_sentences.append((s,score))
+            best_sentences.append((s,score,rule))
             best_sentences.sort(key=lambda tup: tup[1]) 
             
             if len(best_sentences) > 10:
