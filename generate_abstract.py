@@ -264,7 +264,7 @@ def scoreSentence(s,d):
     return f_ease,f_grade,length
 
 
-def outputSentence(s):
+def outputSentence(s,subject):
     '''
     '''
 
@@ -274,7 +274,12 @@ def outputSentence(s):
         if s[0][0] in string.ascii_letters:
             output += (s[0][0].upper() + s[0][1:])  # make first word capital
         for word in s[1:]:
-            output += ' ' + word.lower()
+            if word == subject:
+                output += ' ' + word
+            elif word in ['a','I']:
+                output += ' ' + word
+            else:
+                output += ' ' + word.lower()
         output += '.'
     return output
 
@@ -437,7 +442,7 @@ def main():
     print('Subject: '+ subject[0].split()[0] + '\n')
     abstract = '    '     
     for i in range(0 , setences_in_paragraph):
-        abstract += outputSentence(best_sentences[i][0]) + ' ';
+        abstract += outputSentence(best_sentences[i][0],subject[0].split()[0]) + ' ';
         
     
     print(abstract)
