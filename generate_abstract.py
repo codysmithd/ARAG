@@ -33,7 +33,7 @@ def applyBigrams(sentence, bigrams):
 
     gram_index = 0
     for tg in tagged_ngrams:
-        k = tg[0][1] + " " + tg[1][1] + " " + tg[2][1];
+        k = tg[0][1] + " " + tg[1][1]
         if k in bigrams.keys():
             if len(bigrams[k]) > 1:
                 random.shuffle(bigrams[k])
@@ -109,7 +109,7 @@ def applyPOSBigrams(taggedSentence, bigrams):
                 for word in bigrams[k][0]:
                     if word == '':
                         skip = True
-
+                    
 
                 if not skip:
                     sentence[gram_index] = bigrams[k][0][0]
@@ -155,7 +155,6 @@ def applyPOSQuadgrams(taggedSentence, quadgrams):
 
 
     tagged_ngrams = ngrams(taggedSentence, 4);
-
     sentence = ['']*len(taggedSentence)
 
     gram_index = 0
@@ -178,6 +177,51 @@ def applyPOSQuadgrams(taggedSentence, quadgrams):
                     sentence[gram_index+3] = quadgrams[k][0][3]
 
         gram_index = gram_index + 1
+    return sentence
+
+
+
+
+
+def applyBigramsSubjectMatch(sentence, bigrams, subject):
+    if len(sentence) < 2:
+        return []
+
+    tagged = nltk.pos_tag(sentence, tagset=tag_set)
+    tagged_ngrams = ngrams(tagged, 2);
+
+    gram_index = 0
+    for tg in tagged_ngrams:
+        k = tg[0][1] + " " + tg[1][1]
+        if k in bigrams.keys():
+            for gram in bigrams[k]:
+                if subject in gram:
+                    sentence[gram_index] = bigrams[k][0][0]
+                    sentence[gram_index+1] = bigrams[k][0][1]
+
+
+        gram_index = gram_index + 1
+    return sentence
+    
+def applyTrigramsSubjectMatch(sentence, trigrams, subject):
+    if len(sentence) < 3:
+        return []
+    
+    tagged = nltk.pos_tag(sentence, tagset=tag_set)
+    tagged_ngrams = ngrams(tagged, 3);
+    
+    gram_index = 0
+    for tg in tagged_ngrams:
+        k = tg[0][1] + " " + tg[1][1] + " " + tg[2][1];
+        if k in trigrams.keys():
+            for gram in trigrams[k]:
+                if subject in gram:
+                    sentence[gram_index] = gram[0]
+                    sentence[gram_index+1] = gram[1]
+                    sentence[gram_index+2] = gram[2]
+
+        gram_index = gram_index + 1
+        
     return sentence
 
 
@@ -263,12 +307,38 @@ def main():
     trigrams = ngrams[3]
     quadgrams = ngrams[4]
 
-#    print(quadgrams)
+#    print(bigrams)
 #
     print('Grammer done. Making sentences.')
 
     # Print out max sentences generated from the cfg
+    common_nouns = {}
+    for k in bigrams:
+        for tup in bigrams[k]:
+            pos_one =  k.split()[0][0];
+            pos_two =  k.split()[1][0];
+            if pos_one == 'N':
+                key = tup[0] + " " + k.split()[0];
 
+                if key not in common_nouns.keys():
+                    common_nouns[key] = 0
+                common_nouns[key]+=1
+                
+            if pos_two == 'N':
+                key = tup[1] + " " + k.split()[1];
+                if key not in common_nouns.keys():
+                    common_nouns[key] = 0
+                common_nouns[key]+=1
+    common_nouns_list = []
+    for k in common_nouns:
+        common_nouns_list.append((k,common_nouns[k]))
+    common_nouns_list.sort(key=lambda tup: tup[1]) 
+    common_nouns_list_nnp = []
+    
+    for t in common_nouns_list:
+        if t[0].split()[1] == 'NNP':
+            common_nouns_list_nnp.append(t)
+#            print(t)
     
     d = cmudict.dict()
 
@@ -293,9 +363,11 @@ def main():
     freq_dist_rules_list = []
     for k in freq_dist_rules:
         freq_dist_rules_list.append((k,freq_dist_rules[k]))
-        
     freq_dist_rules_list.sort(key=lambda tup: tup[1], reverse=True) 
 
+    
+        
+    
     print("Scanning Rules...")
     for rule in rules:
         rule_score = scoreRule_A(rule,freq_dist_rules_list,mean_sent_size)
@@ -303,8 +375,16 @@ def main():
         best_rules.sort(key=lambda tup: tup[1]) 
         if len(best_rules) > 10:
             best_rules = best_rules[1:]
-    
+            
+            
+    # RUN PARAMERS        
     iterations = 10
+    subject_range = 15
+    
+        
+    print('Finding subject...')
+    subject = common_nouns_list_nnp[-subject_range:][int(random.random()*subject_range)]
+    print(subject)
     
     rule_idx = 0;
     si = 1
@@ -314,15 +394,15 @@ def main():
         for rule in best_rules:
             print(rule_idx)
             rule_idx+=1
-    
+            
             s = applyPOSBigrams(rule[0],bigrams);
             s = applyTrigrams(s,trigrams);
-    
-    
-            fease, fgrade, length = scoreSentence(s,d)
-                    
-            score = fease - fgrade 
+#            s =  applyTrigramsSubjectMatch(s, trigrams, subject)
+            s = applyBigramsSubjectMatch(s, bigrams, subject)
             
+            fease, fgrade, length = scoreSentence(s,d)
+            
+            score = fease - fgrade 
             
             best_sentences.append((s,score,rule))
             best_sentences.sort(key=lambda tup: tup[1]) 
