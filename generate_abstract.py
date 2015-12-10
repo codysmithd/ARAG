@@ -418,7 +418,7 @@ def main():
             
             s = applyPOSBigrams(rule[0],bigrams);
             s = applyTrigrams(s,trigrams);
-            s =  applyTrigramsSubjectMatch(s, trigrams, subject)
+            s = applyTrigramsSubjectMatch(s, trigrams, subject)
             s = applyBigramsSubjectMatch(s, bigrams, subject)
             fease, fgrade, length = scoreSentence(s,d)
             
@@ -430,11 +430,11 @@ def main():
             if len(best_sentences) > n_best_sent:
                 best_sentences = best_sentences[1:]
 
-#    for s in best_sentences:
-#        print(outputSentence(s[0]))
-#        print(s[1])
-#        print(s[2])
-#        print()
+    for s in best_sentences:
+        print(outputSentence(s[0],subject[0].split()[0]))
+        print(s[1])
+        print(s[2])
+        print()
 
 
 
