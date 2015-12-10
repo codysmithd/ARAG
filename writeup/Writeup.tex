@@ -58,7 +58,7 @@ In this paper we describe an approach to generate academic report abstracts, giv
 
 \section{Corpora}
 
-To create a successful system, first corpora of different domain's abstracts needed to be created. For our purposes, it was important that the reports were sorted by domain, and that the topics of the papers were similar. While many different options were considered, to manage the data in a straight-forward manager, the abstracts were copied out of reports that were manually copied into plain text files. The directory structure for our corpus is shown in Figure  \ref{fig:Directorystructure}.
+To create a successful system, first corpora of different domain's abstracts needed to be created. For our purposes, it was important that the reports were sorted by domain, and that the topics of the papers were similar. While many different options were considered, to manage the data in a straight-forward manager, the abstracts were copied out of reports that were manually copied into plain text files. The directory structure for our corpus is shown in Figure \ref{fig:Directorystructure}.
 
 \begin{figure}[!ht]
 	\centering
@@ -67,21 +67,7 @@ To create a successful system, first corpora of different domain's abstracts nee
 	\label{fig:Directorystructure}
 \end{figure}
 
-\section{Solution Overview}
-This is where we will talk about the solition \ref{fig:SolutionOverview}.
-\begin{figure}[!ht]
-	\centering
-	\includegraphics[width=.4\textwidth]{overall_flow}
-	\caption{Directory structure for the corpora.}
-	\label{fig:Directorystructure}
-\end{figure}
-
-
-When accessing data from a corpus is required, the operation is as simple as looping over that directory and extracting the text from the text file. The code for doing that is shown in Figure \ref{fig:Codeparse}. Any additional corpus added to a domain directory will automatically be processed as additional data. The next important step for this project is to preprocess the raw text from the abstracts. As described in the previous section, text is divided into sub directories where files contain individual abstracts.
-
-\subsection{Preprocessing}
-
-The first step in the preprocessing loads the text from a single corpora directory. For instance, choosing the directory ‘/computerscience’ will only load abstracts from the ‘Computer Science’ topic from which to preprocess text and eventually train our generator. Code is stripped of newline characters such that text will only be contiguous sentences.
+When accessing data from a corpus is required, the operation is as simple as looping over that directory and extracting the text from the text file. The code for doing that is shown in Figure \ref{fig:Codeparse}. Any additional corpus added to a domain directory will automatically be processed as additional data.
 
 \begin{figure}[!ht]
 	\begin{verbatim}
@@ -98,37 +84,48 @@ The first step in the preprocessing loads the text from a single corpora directo
 	\label{fig:Codeparse}
 \end{figure}
 
-Once the read is complete, the raw text is stripped of all text not contained in a whitelist. This whitelist contains all standard ASCII letters and digits, as well as a list of allowed characters. Manual inspection of the text proved the whitelist to be critical to guarantee no other special characters were included in the final data. Due to the need for sentence/word parsing as well as keeping hyphenated words or words with asterisks, certain popular in text characters such as periods ‘.’, spaces ‘ ‘, hyphens ‘-’, and asterisks ‘*’ are permitted and included in the whitelist.
+We created three total corpora, each for a different domain of different sizes and from different sources. Are hope was that by having different domains, sizes, and sources we would be able to evaluate our solution easier and that their differences would expose flaws or sucesses in the system.
 
-After the data is read in and compared against the whitelist, sentences are parsed. The parser moves over the text tokenizing every word and placing them into a list associated with a unique sentence. Decimal valued numbers are are found first with a regular expression, and are treated as individual tokens, otherwise, a string containing a period ‘.’ is considered the last word in the current sentence. The period is finally stripped from the sentence as clean tokenized words will be associated with our vocabulary. Future revisions may capture a variety of honorifics (e.g. ‘Dr.’) along associated with names of people as single tokens, however this is currently not supported.
+\subsection{Computer Science Corpus}
 
-The preprocessing of the raw data is now complete, however we must store this data in a way that we can utilize context free grammar (CFG). The preprocessing stage must store parts-of-speech tags of the clean sentences, parts-of-speech tags of the vocabulary, as well as N-Grams and their respective parts of speech. The format for storing this information is described in Figure 3.
+The computer science corpus is a collection of 24 computer science paper abstracts. These were taken from the 2015 publications from Carnagie Mellon University (CMU), ranging from identifier CMU-CS-15-100 and on. Besides their shared domain, the authors and topics vary from papers about searching algorthms, statistics, vertual machines and more.
+
+\subsection{Linguistics Corpus}
+
+The linguistics corpus is a collection of 17 abstracts from mendeley.com, tagged with the topic linguistics. The filenames in the corpora folder are the ISSN. Besides the shared linguistics tag, each of the abstracts do not share authors or topics. The topics range from lexical semantics, speech and pronounciation, linguistic universals, visualizing linguistic data, and more.
+
+\subsection{Nanocomputing Corpus}
+
+The nanocomputing corpus is a collection on 13 abstracts from found Google scholar with MORE INFORMATION HERE.
+
+\section{Solution Overview}
+
+The algorithm we developed is broken into three major parts. These parts include preprocessing, sentence generation, and scoring. An overview of each of these three steps is shown as Figure \ref{fig:SolutionOverview}.
 
 \begin{figure}[!ht]
-	\begin{verbatim}
-	grammar_string =
-	"""
-	S -> NP VP
-	PP -> P NP
-	NP -> Det N | Det N PP | 'I'
-	VP -> V NP | VP PP
-	Det -> 'a' | 'my'
-	N -> 'cow' | ‘pants’
-	V -> 'through'
-	P -> 'in'
-	"""
-	\end{verbatim}
-	\caption{Code to parse corpus.}
-	\label{fig:gramstring}
+	\centering
+	\includegraphics[width=.4\textwidth]{overall_flow}
+	\caption{Directory structure for the corpora.}
+	\label{fig:Directorystructure}
 \end{figure}
 
-The grammar string is formatted in two primary parts: the grammar rules, and vocabulary grouped by their respective parts of speech, separated by the pipe ‘|’ character. A grammar rule consists of an input part of speech tag, or the ‘S’ symbol denoting the start of a sentence, followed by a sequence of possible parts of speech tags that could follow that input. For the abstract generator, every new sentence in our corpus will generate a unique rule. In this way we guarantee the sentence will be grammatically correct while ensuring we have the minimum vocabulary to fill the rule. The final grammar string is used to create the NLTK grammar object for sentence generation.
-N-Grams are also collected during the preprocessing step. For the abstract generator, 2-Grams, 3-Grams, and 4-Grams are collected. These grams will be applied to post-generated text to improve their viability as readable and grammatically correct English sentences. A dictionary of N-Grams is created where the keys are  length of the gram (N), and the values are lists of tuples containing the N-Grams with their respective parts of speech.
+\subsection{Preprocessing}
 
-\subsection{Sentence and Grammar Scoring}
+The first step in the preprocessing loads the text from a single corpus directory. For instance, choosing the directory ‘/computer_science’ will only load abstracts from the ‘Computer Science’ topic from which to preprocess text and eventually train our generator. Each line is read and the newline characters are stripped such that text will only be contiguous sentences.
 
-After the creation of the grammar from the corpus, the grammar needs to have each elements scored to sort out what structures and words make sense and what structures and words don’t. There are a number of criteria which are used to score the grammar rules. Starting with a score of zero, some features add a negative score, and others a positive. A threshold is set, and grammar rules that fall below that threshold are not used in creating the context-free grammar (CFG).
-After the CFG is created, it can be used to generate new sentences from the rules. There are a huge number of potential sentences that can be generated from the CFG, so a way to select good sentences and bad sentences is a necessity. By evaluating and scoring the sentences, good sentences can be chosen from the generated sentences. Similar to how the grammar was scored, the sentences are scored against features to either add or subtract from their score. These features include number of unique words, as well as points for matching bi-grams, tri-grams, and quad-grams from the corpus. The highest scoring sentences are then selected for use in the abstract.
+Once the read is complete, the raw text is stripped of all text in a blacklist. This blacklist contains characters such as quotes, parenthisis, and commas. Manual inspection of the text proved the blacklist to be critical to guarantee no unwanted special characters were included in the final data. It was decided to use a blacklist instead of a whitelist because minus a couple of problematic characters, most punctuation seems to be valuble or at least has no negative consiquence to the final result.
+
+After the data is read in and the blacklist is stripped out, sentences are parsed. The parser moves over the text tokenizing every word and placing them into a list associated with a unique sentence. Decimal valued numbers are are found first with a regular expression, and are treated as individual tokens, otherwise, a string containing a period ‘.’ is considered the last word in the current sentence. The period is finally stripped from the sentence as clean tokenized words will be associated with our vocabulary. Future revisions may capture a variety of honorifics (e.g. ‘Dr.’) along associated with names of people as single tokens, however this is currently not supported.
+
+The preprocessing of the raw data is now complete, however we must store this data in a way that we can utilize a form of context free grammar (CFG). The preprocessing stage stores parts-of-speech tags of the cleaned sentences, parts-of-speech tags of the vocabulary in a dictionary who's keys are the word's part-of-speech (POS) tags, as well as N-Grams and their respective parts of speech. For the abstract generator, 2-Grams, 3-Grams, and 4-Grams are collected.
+
+\subsection{Rules}
+
+For each sentence, a rule is created. These rules are a sequence of POS tags which generalize the structure of the sentence. The sentences are POS tagged using NLTK's POS tagger, and utilize Penn's Treebank tags. These rules will sometimes contain either undesireable structures, incorrect tags, or other issues so to sort the good rules from the bad, the rules are scored. Starting with a score of zero, positive and negative features are calculated against the rule. Positive features include the number of occurrences of the most common corpus tags. Negative features include the difference in the length of the rule from the mean length of all sentences in the corpus. These rules are then sorted by their score, so that the best n rules can be used to generate n sentences.
+
+\subsection{Topic Selection}
+
+For each generated abstract, a topic must be chosen. This topic represents the main subject for the paper, and is chosen from the corpus. To chose a topic, first the corpus's NNP tags are sorted by frequency. The NNP tag is the Treebank tag for singular proper nouns, which often work well as topics. Within a set-able min frequency, a topic is then chosen randomly picked. This topic then becomes preferentially added to generated sentences during their creation.
 
 \subsection{Results and Summary}
 
