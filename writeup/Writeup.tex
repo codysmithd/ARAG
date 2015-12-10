@@ -137,23 +137,72 @@ Then, the processes is repeated again, expect this time only for rules involving
 
 \subsection{Sentence Scoring}
 
-After the sentences are generated, selecting which sentences will be used in the abstract is done just like the rules with scoring. There are positive and negative features chosen to separate good sentences from bad, and each generated sentence is scored against these features. For sentences, positive features include the Flesch reading ease. 
+After the sentences are generated, selecting which sentences will be used in the abstract is done just like the rules with scoring. There are positive and negative features chosen to separate good sentences from bad, and each generated sentence is scored against these features. For sentences, positive features include the Flesch-Kinacaid reading ease. The Flesch-Kinacaid reading ease is a measure of how easy a selection of text is to read, and is calcuated with the forumla shown as INSERT FORMULA HERE.
+
+Negative features include duplicate words in a row which has a very steep penalty, and the Flesch–Kincaid grade level. The Flesch-Kinacaid grade test is a way to calculate the US school system grade level for a passage. In this case lower is a lower grade level and thefore easier to understand.
+
+All of these positive and negative features are added together to form a total score for each generated sentence. This score is used to sort the sentences, and the top sentences are chosen to generate an abstract with.
 
 \section{Results and Summary}
 
-TODO
+This algorithm as described was implemented in python, and is open source and viewable on github.com(make this link to github repo). Due to time constraints, many details of the implementaion are not ideal, however the algorithm was used sucessfully to generate many abstracts for evaluation. Once these abstracts were being generated for the given domains, we then took a sample and evaluated them to exaimine how sucessful we were.
 
 \subsection{Evaluation Criteria}
 
 There are many challenges with evaluating the generated abstracts, especially surrounding quantifing how sucessful they are. However, as some form of evaluation is required to make sense of our results, we designed two methods to evaulate abstracts. The first is the number of edits required to make the generated abstracts grammatically correct. The second is the the number of edits needed to make the report semantically correct. Both of these measure a single edit as a contiguous change made to the abstract.
 
-\subsection{Example Abstract with Scoring}
+\subsection{Example Abstract}
+
+To illustrate how the abstacts are scored, the following is an actual example generated abstract, with one evaluator's syntax and semantic corrections. The chosen subject of the abstract is `graphs`.
+
+\begin{figure}[!ht]
+	\begin{verbatim}
+	We present the acid arms of graphs and b-a algorithms property of graphs design in a contextual. We learn these transition aspects of graphs and coordinate graphs key part of the part of the interplay. Graphs simulation data to integrate properties in key of being bound and graphs by building initiated as queries. Graphs are methods to perform creators in general by being programmed and instead of existing case of businesses. Of this latter we investigate design images to real approximate ideas in graphs and nonparanormal model improvements as graphs spatial-connectivity and productivity.
+	\end{verbatim}
+
+	\caption{Raw output from abstract generator.}
+	\label{fig:example_output_raw}
+\end{figure}
+
+Then, after one evaluator attempted to fix the grammer of the generated abstract, a total of 7 edits where made. The result was as follows:
+
+\begin{figure}[!ht]
+	\begin{verbatim}
+	We present the acid arms of graphs and b-a algorithms property of graphs design in a context. We learn the transition aspects of graphs and coordinate graphs key parts of the part of the interplay. Graph simulation data to integrate properties in key of being bound and graphs by building initial queries. Graphs are methods to perform creators in general by being programmed and instead of existing case of businesses. Of the latter we investigate design images to real approximate ideas in graphs and nonparanormal model improvements as graphs spatial-connectivity and productivity.
+	\end{verbatim}
+
+	\caption{Raw output from abstract generator.}
+	\label{fig:example_output_grammar}
+\end{figure}
+
+It should be noticed that at this point the semantics of the abstract are very much still not ideal. Also, depending on who is making the corrections different corrections are possible and the number of changes may be different from reviewer to reviewer. Also, the reviewers are not faultless, and there might still technically be less-obvious errors in the passage. To fix the semantics one reviewer edited the abstract with 25 edits and the result was as follows:
+
+\begin{figure}[!ht]
+	\begin{verbatim}
+	We present graphs and b-a algorithms. We learn the transition aspects of graphs and coordinate graphs key parts. Graph data integrates properties of being bound as queries. Graphs are methods to perform analysis in general by being programmed. We investigate design images to approximate ideas in graphs and nonparanormal model improvements as graphs spatial-connectivity and productivity.
+	\end{verbatim}
+
+	\caption{Raw output from abstract generator.}
+	\label{fig:example_output_grammar}
+\end{figure}
+
+It should be noticed that most of the edits to the abstract were deleting text with only a single word added, and otherwise the changes were minimal. The core content of the generated abstract was maintained and this is perhaps validation of the original concept for the generator.
 
 \subsection{Analysis of Different Evaluators}
 
+To quantify the differences and challenges with using human evaluators, the authors of this paper both evaluated a selection of passages. With each passage each evaluator evaluated differently, and a table of their number of grammatical and sematic edit scores for the passages are shown below.
+
+MORE HERE
+
+\subsection{Results Observations}
+
+There were many observations made about the generated abstracts during their evaluations. The first is that the size of the corpus made a large difference in the results. The computer science corpus had the most abstracts and also seemed to perform the best. Also, topic selection is an important step. Reports with bad topic selection did not have good results, where good topics generally had better results. 
+
 \section{Conclusion}
 
-Through a combination of techniques such as Context-Free Grammar and N-grams sentences can be generated. These sentences, if carefully selected, can be arranged intelligently to form more complete documents. By training a system on report abstracts, this system is able to use the content and structure of the abstracts to generate new abstracts.
+Through a combination of techniques indivdual sentences that are characteristic of a corpus can be generated. These sentences, if carefully selected, can be arranged intelligently to form more complete documents. By training a system on report abstracts, this system is able to use the content and structure of the abstracts to generate new abstracts with topics chosen from nouns in the corpus. With relativly minimal editing these generated abstracts can be made grammatically and semantically correct.
+
+\subsection{Future Improvement}
 
 \addtolength{\textheight}{-12cm}   % This command serves to balance the column lengths
                                   % on the last page of the document manually. It shortens
