@@ -8,7 +8,7 @@
 \usepackage{multirow}
 \usepackage{array}
 \usepackage{courier}
-
+\usepackage{url}
 %\documentclass[a4paper, 10pt, conference]{ieeeconf}      % Use this line for a4 paper
 
 \IEEEoverridecommandlockouts                              % This command is only needed if
@@ -101,11 +101,11 @@ The computer science corpus is a collection of 24 computer science paper abstrac
 
 \subsection{Linguistics Corpus}
 
-The linguistics corpus is a collection of 17 abstracts from mendeley.com, tagged with the topic linguistics. The filenames in the corpora folder are the ISSN. Besides the shared linguistics tag, each of the abstracts do not share authors or topics. The topics range from lexical semantics, speech and pronounciation, linguistic universals, visualizing linguistic data, and more.
+The linguistics corpus is a collection of 17 abstracts from mendeley.com, tagged with the topic linguistics. The filenames in the corpora folder are the ISSN. Besides the shared linguistics tag, each of the abstracts do not share authors or topics. The topics range from lexical semantics, speech and pronunciation, linguistic universals, visualizing linguistic data, and more.
 
 \subsection{Nanocomputing Corpus}
 
-The nanocomputing corpus is a collection on 13 abstracts from found Google scholar with MORE INFORMATION HERE.
+The nanocomputing corpus is a collection on 13 abstracts from found Google scholar under Dr. Kudithapudi's page for published work\footnote{Works can be found at: \url{https://scholar.google.com/citations?user=RKGYlZEAAAAJ&hl=en&oi=ao}}. 
 
 \section{Solution Overview}
 
@@ -130,7 +130,7 @@ The preprocessing of the raw data is now complete, however we must store this da
 
 \subsection{Rules}
 
-For each sentence, a rule is created. These rules are a sequence of POS tags which generalize the structure of the sentence. The sentences are POS tagged using NLTK's POS tagger, and utilize Penn's Treebank tags. These rules will sometimes contain either undesireable structures, incorrect tags, or other issues so to sort the good rules from the bad, the rules are scored. Starting with a score of zero, positive and negative features are calculated against the rule. Positive features include the number of occurrences of the most common corpus tags. Negative features include the difference in the length of the rule from the mean length of all sentences in the corpus. These rules are then sorted by their score, so that the best n rules can be used to generate n sentences.
+For each sentence, a rule is created. These rules are a sequence of POS tags which generalize the structure of the sentence. The sentences are POS tagged using NLTK's POS tagger, and utilize Penn's Treebank tags. These rules will sometimes contain either undesirable structures, incorrect tags, or other issues so to sort the good rules from the bad, the rules are scored. Starting with a score of zero, positive and negative features are calculated against the rule. Positive features include the number of occurrences of the most common corpus tags. Negative features include the difference in the length of the rule from the mean length of all sentences in the corpus. These rules are then sorted by their score, so that the best n rules can be used to generate n sentences.
 
 \subsection{Topic Selection}
 
@@ -140,29 +140,37 @@ For each generated abstract, a topic must be chosen. This topic represents the m
 
 To generate a sentence, the first step is to select a rule. For our algorithm, we start with the highest scoring rule for the first sentence and continue to move down the list as more sentences are generated. After a rule is selected, it then goes through a couple of stages.
 
-The first is applying bigrams. From left to right, bigrams are applied for each part of speech in the rule. Often times, there are more than one options for which words to use for a part of speech. For efficientcy reasons, one and only one is selected randomly from the possible options, and then we continue until the rule is complete. The second step is similar the first, expect this time with trigrams. Selectively, trigrams are appled to the sentence from left to right, and when there are multiple options one is selected randomly.
+The first is applying bigrams. From left to right, bigrams are applied for each part of speech in the rule. Often times, there are more than one options for which words to use for a part of speech. For efficiency reasons, one and only one is selected randomly from the possible options, and then we continue until the rule is complete. The second step is similar the first, expect this time with trigrams. Selectively, trigrams are appled to the sentence from left to right, and when there are multiple options one is selected randomly.
 
-Then, the processes is repeated again, expect this time only for rules involving NNP tags, for the purpose of inserting the topic of the abstract into the structures. First from left to right where possible the bigrams with NNPs in the sentence are replaced with the topic chosen earlier. Then again the process is repleated with trigrams to replace the NNPs in the sentece with the topic. At this point the generated sentence is ready to scored and potentially used.
+Then, the processes is repeated again, expect this time only for rules involving NNP tags, for the purpose of inserting the topic of the abstract into the structures. First from left to right where possible the bigrams with NNPs in the sentence are replaced with the topic chosen earlier. Then again the process is repeated with trigrams to replace the NNPs in the sentence with the topic. At this point the generated sentence is ready to scored and potentially used.
 
 \subsection{Sentence Scoring}
 
-After the sentences are generated, selecting which sentences will be used in the abstract is done just like the rules with scoring. There are positive and negative features chosen to separate good sentences from bad, and each generated sentence is scored against these features. For sentences, positive features include the Flesch-Kinacaid reading ease. The Flesch-Kinacaid reading ease is a measure of how easy a selection of text is to read, and is calcuated with the forumla shown as INSERT FORMULA HERE.
+After the sentences are generated, selecting which sentences will be used in the abstract is done just like the rules with scoring. There are positive and negative features chosen to separate good sentences from bad, and each generated sentence is scored against these features. For sentences, positive features include the Flesch-Kinacaid reading ease. The Flesch-Kinacaid reading ease is a measure of how easy a selection of text is to read, and is calculated with the formula shown as in  Equation \ref{eq:1}.
 
-Negative features include duplicate words in a row which has a very steep penalty, and the Flesch–Kincaid grade level. The Flesch-Kinacaid grade test is a way to calculate the US school system grade level for a passage. In this case lower is a lower grade level and thefore easier to understand.
+\begin{equation} \label{eq:1}
+\includegraphics[width=.38\textwidth]{ease_eq}
+\end{equation}
+
+Negative features include duplicate words in a row which has a very steep penalty, and the Flesch–Kincaid grade level \cite{si2001statistical} as in  Equation \ref{eq:2}. The Flesch-Kinacaid grade test is a way to calculate the US school system grade level for a passage. In this case lower is a lower grade level and therefore easier to understand.
+
+\begin{equation} \label{eq:2}
+\includegraphics[width=.38\textwidth]{grade_eq}
+\end{equation}
 
 All of these positive and negative features are added together to form a total score for each generated sentence. This score is used to sort the sentences, and the top sentences are chosen to generate an abstract with.
 
 \section{Results and Summary}
 
-This algorithm as described was implemented in python, and is open source and viewable on github.com(make this link to github repo). Due to time constraints, many details of the implementaion are not ideal, however the algorithm was used sucessfully to generate many abstracts for evaluation. Once these abstracts were being generated for the given domains, we then took a sample and evaluated them to exaimine how sucessful we were.
+This algorithm as described was implemented in python, and is open source and viewable on github.com(make this link to github repo). Due to time constraints, many details of the implementation are not ideal, however the algorithm was used successfully to generate many abstracts for evaluation. Once these abstracts were being generated for the given domains, we then took a sample and evaluated them to examine how successful we were.
 
 \subsection{Evaluation Criteria}
 
-There are many challenges with evaluating the generated abstracts, especially surrounding quantifing how sucessful they are. However, as some form of evaluation is required to make sense of our results, we designed two methods to evaulate abstracts. The first is the number of edits required to make the generated abstracts grammatically correct. The second is the the number of edits needed to make the report semantically correct. Both of these measure a single edit as a contiguous change made to the abstract.
+There are many challenges with evaluating the generated abstracts, especially surrounding quantifying how successful they are. However, as some form of evaluation is required to make sense of our results, we designed two methods to evaluate abstracts. The first is the number of edits required to make the generated abstracts grammatically correct. The second is the the number of edits needed to make the report semantically correct. Both of these measure a single edit as a contiguous change made to the abstract.
 
 \subsection{Example Abstract}
 
-To illustrate how the abstacts are scored, the following is an actual example generated abstract, with one evaluator's syntax and semantic corrections. The chosen subject of the abstract is `graphs`.
+To illustrate how the abstracts are scored, the following is an actual example generated abstract, with one evaluator's syntax and semantic corrections. The chosen subject of the abstract is `graphs`.
 
 
 \begin{figure}[!ht]
@@ -174,7 +182,7 @@ To illustrate how the abstacts are scored, the following is an actual example ge
 \normalsize
 
 \noindent
-Then, after one evaluator attempted to fix the grammer of the generated abstract, a total of 7 edits where made. The result was as follows:
+Then, after one evaluator attempted to fix the grammar of the generated abstract, a total of 7 edits where made. The result was as follows:
 
 
 \noindent
@@ -205,7 +213,7 @@ It also should be noticed that most of the edits to the abstract were deleting t
 
 \subsection{Analysis of Different Evaluators}
 
-To quantify the differences and challenges with using human evaluators, the authors of this paper both evaluated a selection of passages. With each passage each evaluator evaluated differently, and a table of their number of grammatical and sematic edit scores for the passages are shown below.
+To quantify the differences and challenges with using human evaluators, the authors of this paper both evaluated a selection of passages. With each passage each evaluator evaluated differently, and a table of their number of grammatical and semantic edit scores for the passages are shown below.
 
 MORE HERE
 
@@ -220,7 +228,7 @@ There were many observations made about the generated abstracts during their eva
 
 \section{Conclusion}
 
-Through a combination of techniques individual sentences that are characteristic of a corpus can be generated. These sentences, if carefully selected, can be arranged intelligently to form more complete documents. By training a system on report abstracts, this system is able to use the content and structure of the abstracts to generate new abstracts with topics chosen from nouns in the corpus. With relativly minimal editing these generated abstracts can be made grammatically and semantically correct.
+Through a combination of techniques individual sentences that are characteristic of a corpus can be generated. These sentences, if carefully selected, can be arranged intelligently to form more complete documents. By training a system on report abstracts, this system is able to use the content and structure of the abstracts to generate new abstracts with topics chosen from nouns in the corpus. With relatively minimal editing these generated abstracts can be made grammatically and semantically correct.
 
 \addtolength{\textheight}{-12cm}   % This command serves to balance the column lengths
                                   % on the last page of the document manually. It shortens
