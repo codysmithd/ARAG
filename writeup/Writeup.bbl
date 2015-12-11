@@ -11,8 +11,8 @@ Luo Si and Jamie Callan.
 \newblock In {\em Proceedings of the tenth international conference on
   Information and knowledge management}, pages 574--576. ACM, 2001.
 
-\bibitem{jeremystribling2015}
-Jeremy Stribling.
-\newblock Scigen - an automatic cs paper generator, dec 2015.
+\bibitem{stribling2005scigen}
+Jeremy Stribling, Max Krohn, and Dan Aguayo.
+\newblock Scigen-an automatic cs paper generator, 2005.
 
 \end{thebibliography}
