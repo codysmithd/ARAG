@@ -7,6 +7,8 @@
 \usepackage{url}
 \usepackage{multirow}
 \usepackage{array}
+\usepackage{courier}
+
 %\documentclass[a4paper, 10pt, conference]{ieeeconf}      % Use this line for a4 paper
 
 \IEEEoverridecommandlockouts                              % This command is only needed if
@@ -109,18 +111,18 @@ The nanocomputing corpus is a collection on 13 abstracts from found Google schol
 
 The algorithm we developed is broken into three major parts. These parts include preprocessing, sentence generation, and scoring. An overview of each of these three steps is shown as Figure \ref{fig:SolutionOverview}.
 
-\begin{figure}[!ht]
+\begin{figure*}[!ht]
 	\centering
-	\includegraphics[width=.4\textwidth]{overall_flow}
-	\caption{Directory structure for the corpora.}
-	\label{fig:Directorystructure}
-\end{figure}
+	\includegraphics[width=1\textwidth]{overall_flow}
+	\caption{Overall program flow. There are three primary stages: Corpra Parsing, processing, and generation. The parsing step is responsible for reading in the raw data, removing strange characters, parsing sentences, and creating the necessary data structures. The processing phase finds then chooses a topic for the abstract based on common proper nouns in the corpus, then scores a set of rules based on a number of criteria. Lastly, the generation takes those rules and creates sentences. Those sentences are then scored based on separate sentence criteria.}
+	\label{fig:SolutionOverview}
+\end{figure*}
 
 \subsection{Preprocessing}
 
-The first step in the preprocessing loads the text from a single corpus directory. For instance, choosing the directory ‘/computer_science’ will only load abstracts from the ‘Computer Science’ topic from which to preprocess text and eventually train our generator. Each line is read and the newline characters are stripped such that text will only be contiguous sentences.
+The first step in the preprocessing loads the text from a single corpus directory. For instance, choosing the directory ‘/computer\textunderscore science’ will only load abstracts from the ‘Computer Science’ topic from which to preprocess text and eventually train our generator. Each line is read and the newline characters are stripped such that text will only be contiguous sentences.
 
-Once the read is complete, the raw text is stripped of all text in a blacklist. This blacklist contains characters such as quotes, parenthisis, and commas. Manual inspection of the text proved the blacklist to be critical to guarantee no unwanted special characters were included in the final data. It was decided to use a blacklist instead of a whitelist because minus a couple of problematic characters, most punctuation seems to be valuble or at least has no negative consiquence to the final result.
+Once the read is complete, the raw text is stripped of all text in a blacklist. This blacklist contains characters such as quotes, parenthesis, and commas. Manual inspection of the text proved the blacklist to be critical to guarantee no unwanted special characters were included in the final data. It was decided to use a blacklist instead of a white-list because minus a couple of problematic characters, most punctuation seems to be valuable or at least has no negative consequence to the final result.
 
 After the data is read in and the blacklist is stripped out, sentences are parsed. The parser moves over the text tokenizing every word and placing them into a list associated with a unique sentence. Decimal valued numbers are are found first with a regular expression, and are treated as individual tokens, otherwise, a string containing a period ‘.’ is considered the last word in the current sentence. The period is finally stripped from the sentence as clean tokenized words will be associated with our vocabulary. Future revisions may capture a variety of honorifics (e.g. ‘Dr.’) along associated with names of people as single tokens, however this is currently not supported.
 
@@ -162,38 +164,44 @@ There are many challenges with evaluating the generated abstracts, especially su
 
 To illustrate how the abstacts are scored, the following is an actual example generated abstract, with one evaluator's syntax and semantic corrections. The chosen subject of the abstract is `graphs`.
 
-\begin{figure}[!ht]
-	\begin{verbatim}
-	We present the acid arms of graphs and b-a algorithms property of graphs design in a contextual. We learn these transition aspects of graphs and coordinate graphs key part of the part of the interplay. Graphs simulation data to integrate properties in key of being bound and graphs by building initiated as queries. Graphs are methods to perform creators in general by being programmed and instead of existing case of businesses. Of this latter we investigate design images to real approximate ideas in graphs and nonparanormal model improvements as graphs spatial-connectivity and productivity.
-	\end{verbatim}
 
+\begin{figure}[!ht]
+\small
+\texttt{ We present the acid arms of graphs and b-a algorithms property of graphs design in a contextual. We learn these transition aspects of graphs and coordinate graphs key part of the part of the interplay. Graphs simulation data to integrate properties in key of being bound and graphs by building initiated as queries. Graphs are methods to perform creators in general by being programmed and instead of existing case of businesses. Of this latter we investigate design images to real approximate ideas in graphs and nonparanormal model improvements as graphs spatial-connectivity and productivity.}
 	\caption{Raw output from abstract generator.}
 	\label{fig:example_output_raw}
 \end{figure}
+\normalsize
 
+\noindent
 Then, after one evaluator attempted to fix the grammer of the generated abstract, a total of 7 edits where made. The result was as follows:
 
-\begin{figure}[!ht]
-	\begin{verbatim}
-	We present the acid arms of graphs and b-a algorithms property of graphs design in a context. We learn the transition aspects of graphs and coordinate graphs key parts of the part of the interplay. Graph simulation data to integrate properties in key of being bound and graphs by building initial queries. Graphs are methods to perform creators in general by being programmed and instead of existing case of businesses. Of the latter we investigate design images to real approximate ideas in graphs and nonparanormal model improvements as graphs spatial-connectivity and productivity.
-	\end{verbatim}
 
+\noindent
+\begin{figure}[!ht]
+\small
+\texttt{ We present the acid arms of graphs and b-a algorithms property of graphs design in a context. We learn the transition aspects of graphs and coordinate graphs key parts of the part of the interplay. Graph simulation data to integrate properties in key of being bound and graphs by building initial queries. Graphs are methods to perform creators in general by being programmed and instead of existing case of businesses. Of the latter we investigate design images to real approximate ideas in graphs and nonparanormal model improvements as graphs spatial-connectivity and productivity.}
 	\caption{Raw output from abstract generator.}
 	\label{fig:example_output_grammar}
 \end{figure}
+\normalsize
 
+\noindent
 It should be noticed that at this point the semantics of the abstract are very much still not ideal. Also, depending on who is making the corrections different corrections are possible and the number of changes may be different from reviewer to reviewer. Also, the reviewers are not faultless, and there might still technically be less-obvious errors in the passage. To fix the semantics one reviewer edited the abstract with 25 edits and the result was as follows:
 
+{
+\noindent
 \begin{figure}[!ht]
-	\begin{verbatim}
-	We present graphs and b-a algorithms. We learn the transition aspects of graphs and coordinate graphs key parts. Graph data integrates properties of being bound as queries. Graphs are methods to perform analysis in general by being programmed. We investigate design images to approximate ideas in graphs and nonparanormal model improvements as graphs spatial-connectivity and productivity.
-	\end{verbatim}
-
-	\caption{Raw output from abstract generator.}
-	\label{fig:example_output_grammar}
+\small
+\texttt{ We present graphs and b-a algorithms. We learn the transition aspects of graphs and coordinate graphs key parts. Graph data integrates properties of being bound as queries. Graphs are methods to perform analysis in general by being programmed. We investigate design images to approximate ideas in graphs and nonparanormal model improvements as graphs spatial-connectivity and productivity.}
+\caption{Raw output from abstract generator.}
+\label{fig:example_output_grammar_two}
 \end{figure}
+\normalsize
+}
 
-It should be noticed that most of the edits to the abstract were deleting text with only a single word added, and otherwise the changes were minimal. The core content of the generated abstract was maintained and this is perhaps validation of the original concept for the generator.
+
+It also should be noticed that most of the edits to the abstract were deleting text with only a single word added, and otherwise the changes were minimal. The core content of the generated abstract was maintained and this is perhaps validation of the original concept for the generator.
 
 \subsection{Analysis of Different Evaluators}
 
@@ -203,13 +211,16 @@ MORE HERE
 
 \subsection{Results Observations}
 
-There were many observations made about the generated abstracts during their evaluations. The first is that the size of the corpus made a large difference in the results. The computer science corpus had the most abstracts and also seemed to perform the best. Also, topic selection is an important step. Reports with bad topic selection did not have good results, where good topics generally had better results. 
+There were many observations made about the generated abstracts during their evaluations. The first is that the size of the corpus made a large difference in the results. The computer science corpus had the most abstracts and also seemed to perform the best. Also, topic selection is an important step. Reports with bad topic selection did not have good results, where good topics generally had better results.
+
+
+\subsection{Future Improvement}
+
+ 
 
 \section{Conclusion}
 
-Through a combination of techniques indivdual sentences that are characteristic of a corpus can be generated. These sentences, if carefully selected, can be arranged intelligently to form more complete documents. By training a system on report abstracts, this system is able to use the content and structure of the abstracts to generate new abstracts with topics chosen from nouns in the corpus. With relativly minimal editing these generated abstracts can be made grammatically and semantically correct.
-
-\subsection{Future Improvement}
+Through a combination of techniques individual sentences that are characteristic of a corpus can be generated. These sentences, if carefully selected, can be arranged intelligently to form more complete documents. By training a system on report abstracts, this system is able to use the content and structure of the abstracts to generate new abstracts with topics chosen from nouns in the corpus. With relativly minimal editing these generated abstracts can be made grammatically and semantically correct.
 
 \addtolength{\textheight}{-12cm}   % This command serves to balance the column lengths
                                   % on the last page of the document manually. It shortens
@@ -243,9 +254,8 @@ Through a combination of techniques indivdual sentences that are characteristic 
 
 
 \bibliographystyle{plain}
-% Single space the bibliography to save space.
-%\begin{singlespace}
 \bibliography{citations}
+
 %\end{singlespace}
 
 
