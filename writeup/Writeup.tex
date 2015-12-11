@@ -70,7 +70,7 @@ To create a successful system, first corpora of different domain's abstracts nee
 \end{figure}
 
 
-When accessing data from a corpus is required, the operation is as simple as looping over that directory and extracting the text from the text file. The code for doing that is shown in Figure \ref{fig:Codeparse}.  Any additional corpus added to a domain directory will automatically be processed as additional data. The next important step for this project is to preprocess the raw text from the abstracts. As described in the previous section, text is divided into sub directories where files contain individual abstracts. 
+When accessing data from a corpus is required, the operation is as simple as looping over that directory and extracting the text from the text file. The code for doing that is shown in Figure \ref{fig:Codeparse}.  Any additional corpus added to a domain directory will automatically be processed as additional data. The next important step for this project is to preprocess the raw text from the abstracts. As described in the previous section, text is divided into sub directories where files contain individual abstracts.
 
 \subsection{Preprocessing}
 
@@ -213,10 +213,30 @@ MORE HERE
 
 There were many observations made about the generated abstracts during their evaluations. The first is that the size of the corpus made a large difference in the results. The computer science corpus had the most abstracts and also seemed to perform the best. Also, topic selection is an important step. Reports with bad topic selection did not have good results, where good topics generally had better results.
 
-
 \subsection{Future Improvement}
 
- 
+While there are many aspects of the algrithm and it's results that exeeded expectations, through the process of creating this system there were many things that showed promise as areas that could be improved. These improvements break down into several major catagories.
+
+\subsubsection{Corpora}
+
+During the development of the algorithm, it became very clear that a larger corpus of abstracts lead to much better results. While there was a cost to processing time, having more vocabulary, more n-grams, and more structures lead to much better generated abstracts. In the future it would be nice to test the algorthem against signifigantly larger corpora. It also became clear that
+when the corpus had a single style, author, or otherwise similar data the results where also better. With that observation it would be nice in the future to improve the corpora by sorting by topic or author to make generated abstracts have a more consistant feel.
+
+\subsubsection{Performance}
+
+The design of the algorithm lends itself to being able to be completed as a series of parallel tasks. However, our implementation was not able to take advantage of this due mostly to time constraints, so increasing the performance by utilizing parallel computing techniques would be a great next step. Also, many individual tasks in the algorithm were also implemented in non-performant ways for the sake of getting completed and tested first, so being able to go back and re-design some of the sub-steps would be a good next step.
+
+\subsubsection{Scoring}
+
+The idea behind scoring at different levels of the generation process was very crucial to the sucess of this algorithm, and the use of scoring in the future would be recommended. However, the use of scoring for this paper is limited to one or two simple positive and negative features. In the future, taking advantage of more advanced scoring techniques as well as how other layers of the process can be scored, sorted, and evaluated to reduce the amount of work nessisary to get a good result would be recommended.
+
+\subsubsection{Part of Speech Tagging}
+
+The Penn Treebank POS tagger that was used in this paper was for the most part sucessful. However, Adding tags for the start and end of sentences was an idea that was consitered but not implemented for this report. Adding this layer into the bigrams and trigrams could serve useful in the future to make the starts and ends to the sentences be less troublesome.
+
+\subsubsection{Machine Learning}
+
+The role of a more tranditional context-free grammar (CFG) system was how this project was started, however due to it's poor performance it was abonded in favor of single-sentence rules that are one level deep. Be re-evaluating the roll of CFG and creating larger and better structured trees, perhaps through machine learning might offer a way to improve the results of the system. Also, machine learning could be utilized to improve scoring, and many other aspects of the algorithm.
 
 \section{Conclusion}
 
