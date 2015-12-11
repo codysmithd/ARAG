@@ -1,9 +1,18 @@
 \begin{thebibliography}{1}
 
+\bibitem{flesch1948new}
+Rudolph Flesch.
+\newblock A new readability yardstick.
+\newblock {\em Journal of applied psychology}, 32(3):221, 1948.
+
 \bibitem{si2001statistical}
 Luo Si and Jamie Callan.
 \newblock A statistical model for scientific readability.
 \newblock In {\em Proceedings of the tenth international conference on
   Information and knowledge management}, pages 574--576. ACM, 2001.
+
+\bibitem{jeremystribling2015}
+Jeremy Stribling.
+\newblock Scigen - an automatic cs paper generator, dec 2015.
 
 \end{thebibliography}

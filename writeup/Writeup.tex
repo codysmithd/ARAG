@@ -9,6 +9,7 @@
 \usepackage{array}
 \usepackage{courier}
 \usepackage{url}
+\usepackage{float}
 %\documentclass[a4paper, 10pt, conference]{ieeeconf}      % Use this line for a4 paper
 
 \IEEEoverridecommandlockouts                              % This command is only needed if
@@ -56,7 +57,7 @@ Generator for Academic Reports: Abstracts
 
 \section{Introduction}
 
-In this paper we describe an approach to generate academic report abstracts, given a corpus of abstracts to learn from.  The training abstracts are used to generate convincing academic abstracts for a given domain via an algorithm implemented in python. The algorithm uses a variety of natural language techniques including context-free grammar, n-gram analysis, and grammar equivalency to fill in a predetermined learned structure for an abstract in that domain. Related works include the SCIgen automatic computer science paper generator, which has successfully generated papers which were accepted at several conferences at the expense of organizers.
+In this paper we describe an approach to generate academic report abstracts, given a corpus of abstracts to learn from.  The training abstracts are used to generate convincing academic abstracts for a given domain via an algorithm implemented in python. The algorithm uses a variety of natural language techniques including context-free grammar, n-gram analysis, and grammar equivalency to fill in a predetermined learned structure for an abstract in that domain. Related works include the SCIgen Automatic Computer Science Paper Generator\cite{jeremystribling2015}, which has successfully generated papers which were accepted at several conferences at the expense of organizers.
 
 \section{Corpora}
 
@@ -140,39 +141,36 @@ For each generated abstract, a topic must be chosen. This topic represents the m
 
 To generate a sentence, the first step is to select a rule. For our algorithm, we start with the highest scoring rule for the first sentence and continue to move down the list as more sentences are generated. After a rule is selected, it then goes through a couple of stages.
 
-The first is applying bigrams. From left to right, bigrams are applied for each part of speech in the rule. Often times, there are more than one options for which words to use for a part of speech. For efficiency reasons, one and only one is selected randomly from the possible options, and then we continue until the rule is complete. The second step is similar the first, expect this time with trigrams. Selectively, trigrams are applied to the sentence from left to right, and when there are multiple options one is selected randomly.
-
-Then, the processes is repeated again, expect this time only for rules involving NNP tags, for the purpose of inserting the topic of the abstract into the structures. First from left to right where possible the bigrams with NNPs in the sentence are replaced with the topic chosen earlier. Then again the process is repeated with trigrams to replace the NNPs in the sentence with the topic. At this point the generated sentence is ready to scored and potentially used.
+The first is applying bigrams. From left to right, bigrams are applied for each part of speech in the rule. Often times, there are more than one options for which words to use for a part of speech. For efficiency reasons, one and only one is selected randomly from the possible options, and then we continue until the rule is complete. The second step is similar the first, expect this time with trigrams. Selectively, trigrams are applied to the sentence from left to right, and when there are multiple options one is selected randomly. The processes is repeated again, expect this time only for rules involving NNP tags, for the purpose of inserting the topic of the abstract into the structures. First from left to right where possible the bigrams with NNPs in the sentence are replaced with the topic chosen earlier. Then again the process is repeated with trigrams to replace the NNPs in the sentence with the topic. At this point the generated sentence is ready to scored and potentially used.
 
 \subsection{Sentence Scoring}
 
-After the sentences are generated, selecting which sentences will be used in the abstract is done just like the rules with scoring. There are positive and negative features chosen to separate good sentences from bad, and each generated sentence is scored against these features. For sentences, positive features include the Flesch-Kinacaid reading ease. The Flesch-Kinacaid reading ease is a measure of how easy a selection of text is to read, and is calculated with the formula shown as in  Equation \ref{eq:1}.
+After the sentences are generated, selecting which sentences will be used in the abstract is done just like the rules with scoring. There are positive and negative features chosen to separate good sentences from bad, and each generated sentence is scored against these features. For sentences, positive features include the Flesch-Kinacaid reading ease. The Flesch-Kinacaid reading ease\cite{flesch1948new} is a measure of how easy a selection of text is to read, and is calculated with the formula shown as in  Equation \ref{eq:1}.
 
 \begin{equation} \label{eq:1}
-\includegraphics[width=.38\textwidth]{ease_eq}
+\includegraphics[width=.4\textwidth]{ease_eq}
 \end{equation}
 
 Negative features include duplicate words in a row which has a very steep penalty, and the Flesch-Kinacaid grade level \cite{si2001statistical} as in  Equation \ref{eq:2}. The Flesch-Kinacaid grade test is a way to calculate the US school system grade level for a passage. In this case lower is a lower grade level and therefore easier to understand.
 
 \begin{equation} \label{eq:2}
-\includegraphics[width=.38\textwidth]{grade_eq}
+\includegraphics[width=.4\textwidth]{grade_eq}
 \end{equation}
 
 All of these positive and negative features are added together to form a total score for each generated sentence. This score is used to sort the sentences, and the top sentences are chosen to generate an abstract with.
 
 \section{Results and Summary}
 
-This algorithm as described was implemented in python, and is open source and viewable on \url{https://github.com/codysmithd/ARAG}. Due to time constraints, many details of the implementation are not ideal, however the algorithm was used successfully to generate many abstracts for evaluation. Once these abstracts were being generated for the given domains, we then took a sample and evaluated them to examine how successful we were.
+This algorithm as described was implemented in python, and is open source and viewable on GitHub\footnote{GitHub Link to Project Directory:  \url{https://github.com/codysmithd/ARAG}}. Due to time constraints, many details of the implementation are not ideal, however the algorithm was used successfully to generate many abstracts for evaluation. Once these abstracts were being generated for the given domains, we then took a sample and evaluated them to examine how successful we were.
 
 \subsection{Evaluation Criteria}
 
 There are many challenges with evaluating the generated abstracts, especially surrounding quantifying how successful they are. However, as some form of evaluation is required to make sense of our results, we designed two methods to evaluate abstracts. The first is the number of edits required to make the generated abstracts grammatically correct. The second is the the number of edits needed to make the report semantically correct. Both of these measure a single edit as a contiguous change made to the abstract.
 
+
 \subsection{Example Abstract}
 
 To illustrate how the abstracts are scored, the following is an actual example generated abstract, with one evaluator's syntax and semantic corrections. The chosen subject of the abstract is `graphs`.
-
-
 \begin{figure}[!ht]
 \small
 \texttt{ We present the acid arms of graphs and b-a algorithms property of graphs design in a contextual. We learn these transition aspects of graphs and coordinate graphs key part of the part of the interplay. Graphs simulation data to integrate properties in key of being bound and graphs by building initiated as queries. Graphs are methods to perform creators in general by being programmed and instead of existing case of businesses. Of this latter we investigate design images to real approximate ideas in graphs and nonparanormal model improvements as graphs spatial-connectivity and productivity.}
@@ -180,11 +178,8 @@ To illustrate how the abstracts are scored, the following is an actual example g
 	\label{fig:example_output_raw}
 \end{figure}
 \normalsize
-
 \noindent
-Then, after one evaluator attempted to fix the grammar of the generated abstract, a total of 7 edits where made. The result was as follows:
-
-
+After an evaluator attempted to fix the grammar of the generated abstract, a total of 7 edits where made. The result was as follows:
 \noindent
 \begin{figure}[!ht]
 \small
@@ -194,12 +189,10 @@ Then, after one evaluator attempted to fix the grammar of the generated abstract
 \end{figure}
 \normalsize
 
-\noindent
-It should be noticed that at this point the semantics of the abstract are very much still not ideal. Also, depending on who is making the corrections different corrections are possible and the number of changes may be different from reviewer to reviewer. Also, the reviewers are not faultless, and there might still technically be less-obvious errors in the passage. To fix the semantics one reviewer edited the abstract with 25 edits and the result was as follows:
-
+It should be noticed that at this point the semantics of the abstract are very much still not ideal. Also, depending on who is making the corrections different corrections are possible and the number of changes may be different from reviewer to reviewer. Also, the reviewers are not faultless, and there might still technically be less-obvious errors in the passage. To fix the semantics one reviewer edited the abstract with 25 edits; the result can be seen in Figure \ref{fig:example_output_grammar_two}
 {
 \noindent
-\begin{figure}[!ht]
+\begin{figure}[H]
 \small
 \texttt{ We present graphs and b-a algorithms. We learn the transition aspects of graphs and coordinate graphs key parts. Graph data integrates properties of being bound as queries. Graphs are methods to perform analysis in general by being programmed. We investigate design images to approximate ideas in graphs and nonparanormal model improvements as graphs spatial-connectivity and productivity.}
 \caption{Raw output from abstract generator.}
@@ -208,14 +201,31 @@ It should be noticed that at this point the semantics of the abstract are very m
 \normalsize
 }
 
-
-It also should be noticed that most of the edits to the abstract were deleting text with only a single word added, and otherwise the changes were minimal. The core content of the generated abstract was maintained and this is perhaps validation of the original concept for the generator.
+Most of the edits to the abstract were deleting text with only a single word added, and otherwise the changes were minimal. The core content of the generated abstract was maintained and this is perhaps validation of the original concept for the generator.
 
 \subsection{Analysis of Different Evaluators}
 
-To quantify the differences and challenges with using human evaluators, the authors of this paper both evaluated a selection of passages. With each passage each evaluator evaluated differently, and a table of their number of grammatical and semantic edit scores for the passages are shown below.
+To quantify the differences and challenges with using human evaluators, the authors of this paper both evaluated a selection of passages. Two evaluators were selected to modify the raw abstracts until they were both readable, and made logical sense. The evaluators were asked to keep track of the two primary evaluation criteria while performing these corrections.
 
-MORE HERE
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=.4\textwidth]{grammer_result}
+	\caption{Results from human grammar correction for two examiners on five different abstracts.}
+	\label{fig:grammarresult}
+\end{figure}
+
+The results from grammar are seen in Figure \ref{fig:grammarresult}. Five random abstracts were chosen to evaluate that were either generated from the Computer Science, Linguistics, or Nanocomputing corpora. Two evaluators then corrected the abstract. Using the same evaluators and the now grammar corrected abstracts, the text was then corrected for semantic sense. The amount of these corrections is tabulated in Figure \ref{fig:semanticresult}.
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=.4\textwidth]{semantic_result}
+	\caption{Results from human semantic correction for two examiners on five different abstracts.}
+	\label{fig:semanticresult}
+\end{figure}
+
+The amount semantic corrections per abstract averaged much higher than the number of grammatical corrections per abstract for both evaluators. This was to be expected as semantically correct text requires a lot of corrections until the text makes logical sense. It also can be noted that for certain abstracts, proportionally less work was needed to correct it for both evaluators. From this we can draw two observations: certain abstracts are of higher quality then others and although it took proportionally less work, one evaluator required more corrections. This leads to an issue when evaluating the text as some people will be naturally more critical of the text then others, however we can still uncover trends in the overall quality of the text in terms of which abstracts required more or less corrections across multiple users. For example if we add the semantic and grammatical scores for each corpus by evaluator, we can rank the abstracts by level of quality. In that case, we rank the abstracts as A3 having the lowest score, followed by A4, A2, A1, then A5 having the highest score and therefore the lowest quality. This quality list is true for both evaluators and therefore seems to be an effective scoring method.
+
+
 
 \subsection{Results Observations}
 
@@ -223,12 +233,12 @@ There were many observations made about the generated abstracts during their eva
 
 \subsection{Future Improvement}
 
-While there are many aspects of the algrithm and it's results that exeeded expectations, through the process of creating this system there were many things that showed promise as areas that could be improved. These improvements break down into several major catagories.
+While there are many aspects of the algorithm and it's results that exceeded expectations, through the process of creating this system there were many things that showed promise as areas that could be improved. These improvements break down into several major categories.
 
 \subsubsection{Corpora}
 
-During the development of the algorithm, it became very clear that a larger corpus of abstracts lead to much better results. While there was a cost to processing time, having more vocabulary, more n-grams, and more structures lead to much better generated abstracts. In the future it would be nice to test the algorthem against signifigantly larger corpora. It also became clear that
-when the corpus had a single style, author, or otherwise similar data the results where also better. With that observation it would be nice in the future to improve the corpora by sorting by topic or author to make generated abstracts have a more consistant feel.
+During the development of the algorithm, it became very clear that a larger corpus of abstracts lead to much better results. While there was a cost to processing time, having more vocabulary, more n-grams, and more structures lead to much better generated abstracts. In the future it would be nice to test the algorithm against significantly larger corpora. It also became clear that
+when the corpus had a single style, author, or otherwise similar data the results where also better. With that observation it would be nice in the future to improve the corpora by sorting by topic or author to make generated abstracts have a more consistent feel.
 
 \subsubsection{Performance}
 
@@ -236,15 +246,15 @@ The design of the algorithm lends itself to being able to be completed as a seri
 
 \subsubsection{Scoring}
 
-The idea behind scoring at different levels of the generation process was very crucial to the sucess of this algorithm, and the use of scoring in the future would be recommended. However, the use of scoring for this paper is limited to one or two simple positive and negative features. In the future, taking advantage of more advanced scoring techniques as well as how other layers of the process can be scored, sorted, and evaluated to reduce the amount of work nessisary to get a good result would be recommended.
+The idea behind scoring at different levels of the generation process was very crucial to the success of this algorithm, and the use of scoring in the future would be recommended. However, the use of scoring for this paper is limited to one or two simple positive and negative features. In the future, taking advantage of more advanced scoring techniques as well as how other layers of the process can be scored, sorted, and evaluated to reduce the amount of work necessary to get a good result would be recommended.
 
 \subsubsection{Part of Speech Tagging}
 
-The Penn Treebank POS tagger that was used in this paper was for the most part sucessful. However, Adding tags for the start and end of sentences was an idea that was consitered but not implemented for this report. Adding this layer into the bigrams and trigrams could serve useful in the future to make the starts and ends to the sentences be less troublesome.
+The Penn Treebank POS tagger that was used in this paper was for the most part successful. However, Adding tags for the start and end of sentences was an idea that was considered but not implemented for this report. Adding this layer into the bigrams and trigrams could serve useful in the future to make the starts and ends to the sentences be less troublesome.
 
 \subsubsection{Machine Learning}
 
-The role of a more tranditional context-free grammar (CFG) system was how this project was started, however due to it's poor performance it was abonded in favor of single-sentence rules that are one level deep. Be re-evaluating the roll of CFG and creating larger and better structured trees, perhaps through machine learning might offer a way to improve the results of the system. Also, machine learning could be utilized to improve scoring, and many other aspects of the algorithm.
+The role of a more traditional context-free grammar (CFG) system was how this project was started, however due to it's poor performance it was abandoned in favor of single-sentence rules that are one level deep. Be re-evaluating the roll of CFG and creating larger and better structured trees, perhaps through machine learning might offer a way to improve the results of the system. Also, machine learning could be utilized to improve scoring, and many other aspects of the algorithm.
 
 \section{Conclusion}
 
