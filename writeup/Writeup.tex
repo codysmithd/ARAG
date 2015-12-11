@@ -140,7 +140,7 @@ For each generated abstract, a topic must be chosen. This topic represents the m
 
 To generate a sentence, the first step is to select a rule. For our algorithm, we start with the highest scoring rule for the first sentence and continue to move down the list as more sentences are generated. After a rule is selected, it then goes through a couple of stages.
 
-The first is applying bigrams. From left to right, bigrams are applied for each part of speech in the rule. Often times, there are more than one options for which words to use for a part of speech. For efficiency reasons, one and only one is selected randomly from the possible options, and then we continue until the rule is complete. The second step is similar the first, expect this time with trigrams. Selectively, trigrams are appled to the sentence from left to right, and when there are multiple options one is selected randomly.
+The first is applying bigrams. From left to right, bigrams are applied for each part of speech in the rule. Often times, there are more than one options for which words to use for a part of speech. For efficiency reasons, one and only one is selected randomly from the possible options, and then we continue until the rule is complete. The second step is similar the first, expect this time with trigrams. Selectively, trigrams are applied to the sentence from left to right, and when there are multiple options one is selected randomly.
 
 Then, the processes is repeated again, expect this time only for rules involving NNP tags, for the purpose of inserting the topic of the abstract into the structures. First from left to right where possible the bigrams with NNPs in the sentence are replaced with the topic chosen earlier. Then again the process is repeated with trigrams to replace the NNPs in the sentence with the topic. At this point the generated sentence is ready to scored and potentially used.
 
@@ -152,7 +152,7 @@ After the sentences are generated, selecting which sentences will be used in the
 \includegraphics[width=.38\textwidth]{ease_eq}
 \end{equation}
 
-Negative features include duplicate words in a row which has a very steep penalty, and the Flesch–Kincaid grade level \cite{si2001statistical} as in  Equation \ref{eq:2}. The Flesch-Kinacaid grade test is a way to calculate the US school system grade level for a passage. In this case lower is a lower grade level and therefore easier to understand.
+Negative features include duplicate words in a row which has a very steep penalty, and the Flesch-Kinacaid grade level \cite{si2001statistical} as in  Equation \ref{eq:2}. The Flesch-Kinacaid grade test is a way to calculate the US school system grade level for a passage. In this case lower is a lower grade level and therefore easier to understand.
 
 \begin{equation} \label{eq:2}
 \includegraphics[width=.38\textwidth]{grade_eq}
@@ -162,7 +162,7 @@ All of these positive and negative features are added together to form a total s
 
 \section{Results and Summary}
 
-This algorithm as described was implemented in python, and is open source and viewable on github.com(make this link to github repo). Due to time constraints, many details of the implementation are not ideal, however the algorithm was used successfully to generate many abstracts for evaluation. Once these abstracts were being generated for the given domains, we then took a sample and evaluated them to examine how successful we were.
+This algorithm as described was implemented in python, and is open source and viewable on \url{https://github.com/codysmithd/ARAG}. Due to time constraints, many details of the implementation are not ideal, however the algorithm was used successfully to generate many abstracts for evaluation. Once these abstracts were being generated for the given domains, we then took a sample and evaluated them to examine how successful we were.
 
 \subsection{Evaluation Criteria}
 
